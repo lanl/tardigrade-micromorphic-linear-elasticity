@@ -404,7 +404,7 @@ Update project name
       ./src/cpp/micromorphic_linear_elasticity.h
 
       # Replace upper case occurrences in place
-      $ sed -i 's/CPP_STUB/MY_PROJECT/g' $(grep -ri micromorphic_linear_elasticity . --exclude-dir={build,.git} -l)
+      $ sed -i 's/MICROMORPHIC_LINEAR_ELASTICITY/MY_PROJECT/g' $(grep -ri micromorphic_linear_elasticity . --exclude-dir={build,.git} -l)
 
 4. Verify no more occurrences of project name ``micromorphic_linear_elasticity``
 
@@ -419,14 +419,14 @@ Update project name
       $ grep -ri micromorphic_linear_elasticity . --exclude-dir={build,.git} -l
       # no stdout to terminal because no files found
 
-5. Search and replace camelCase project name occurrences, e.g. ``cppStub``.
+5. Search and replace camelCase project name occurrences, e.g. ``micromorphicLinearElasticity``.
 
    .. code-block:: bash
 
-      $ grep -r cppStub . --exclude-dir={build,.git}
+      $ grep -r micromorphicLinearElasticity . --exclude-dir={build,.git}
       ...
-      $ sed -i 's/cppStub/myProject/g' $(grep -r cppStub . --exclude-dir={build,.git} -l)
-      $ grep -r cppStub . --exclude-dir={build,.git} -l
+      $ sed -i 's/micromorphicLinearElasticity/myProject/g' $(grep -r micromorphicLinearElasticity . --exclude-dir={build,.git} -l)
+      $ grep -r micromorphicLinearElasticity . --exclude-dir={build,.git} -l
       # no stdout to terminal because no files found
 
 6. Find files containing the project in their file name
