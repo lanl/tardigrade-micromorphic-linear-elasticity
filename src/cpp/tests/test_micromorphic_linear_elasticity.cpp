@@ -5,6 +5,9 @@
 #include<fstream>
 #include<iostream>
 
+#define BOOST_TEST_MODULE test_micromorphic_linear_elasticity
+#include <boost/test/included/unit_test.hpp>
+
 typedef micromorphicTools::constantType constantType;
 typedef micromorphicTools::constantVector constantVector;
 typedef micromorphicTools::constantMatrix constantMatrix;
@@ -46,11 +49,10 @@ struct cerr_redirect{
         std::streambuf * old;
 };
 
-int test_computeDeformationMeasures( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeDeformationMeasures ){
     /*!
      * Test the computation of the deformation metrics.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector deformationGradient = { -0.50668478, -0.48303615, -1.43907185,
@@ -87,26 +89,13 @@ int test_computeDeformationMeasures( std::ofstream &results ){
     errorOut error = micromorphicLinearElasticity::computeDeformationMeasures( deformationGradient, microDeformation, gradientMicroDeformation,
                                                                                resultC, resultPsi, resultGamma );
 
-    if ( error ){
-        error->print();
-        results << "test_computeDeformationMeasures & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultC, answerC ) ){
-        results << "test_computeDeformationMeasures (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultC, answerC ) );
 
-    if ( !vectorTools::fuzzyEquals( resultPsi, answerPsi ) ){
-        results << "test_computeDeformationMeasures (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultPsi, answerPsi ) );
 
-    if ( !vectorTools::fuzzyEquals( resultGamma, answerGamma ) ){
-        results << "test_computeDeformationMeasures (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultGamma, answerGamma ) );
 
     //Test the jacobians
 
@@ -117,25 +106,13 @@ int test_computeDeformationMeasures( std::ofstream &results ){
                                                                        resultCJ, resultPsiJ, resultGammaJ, dCdF, dPsidF, dPsidXi,
                                                                        dGammadF, dGammadGradXi );
 
-    if ( error ){
-        error->print();
-        results << "test_computeDeformationMeasures & False\n";
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultCJ, answerC ) ){
-        results << "test_computeDeformationMeasures (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultCJ, answerC ) );
 
-    if ( !vectorTools::fuzzyEquals( resultPsiJ, answerPsi ) ){
-        results << "test_computeDeformationMeasures (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultPsiJ, answerPsi ) );
 
-    if ( !vectorTools::fuzzyEquals( resultGammaJ, answerGamma ) ){
-        results << "test_computeDeformationMeasures (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultGammaJ, answerGamma ) );
 
     //Test jacobians w.r.t. the deformation gradient
     constantType eps = 1e-6;
@@ -150,48 +127,30 @@ int test_computeDeformationMeasures( std::ofstream &results ){
         error =  micromorphicLinearElasticity::computeDeformationMeasures( deformationGradient + delta, microDeformation, 
                                                                            gradientMicroDeformation,
                                                                            resultC_P, resultPsi_P, resultGamma_P );
-
-        if ( error ){
-            error->print();
-            results << "test_computeDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error =  micromorphicLinearElasticity::computeDeformationMeasures( deformationGradient - delta, microDeformation, 
                                                                            gradientMicroDeformation,
                                                                            resultC_M, resultPsi_M, resultGamma_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( resultC_P - resultC_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dCdF[j][i] ) ){
-                results << "test_computeDeformationMeasures (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dCdF[j][i] ) );
         }
 
         gradCol = ( resultPsi_P - resultPsi_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dPsidF[j][i] ) ){
-                results << "test_computeDeformationMeasures (test 8) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dPsidF[j][i] ) );
         }
 
         gradCol = ( resultGamma_P - resultGamma_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dGammadF[j][i] ) ){
-                results << "test_computeDeformationMeasures (test 9) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dGammadF[j][i] ) );
         }
     }
 
@@ -208,45 +167,29 @@ int test_computeDeformationMeasures( std::ofstream &results ){
                                                                            gradientMicroDeformation,
                                                                            resultC_P, resultPsi_P, resultGamma_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error =  micromorphicLinearElasticity::computeDeformationMeasures( deformationGradient, microDeformation - delta, 
                                                                            gradientMicroDeformation,
                                                                            resultC_M, resultPsi_M, resultGamma_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( resultC_P - resultC_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_computeDeformationMeasures (test 10) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         gradCol = ( resultPsi_P - resultPsi_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dPsidXi[j][i] ) ){
-                results << "test_computeDeformationMeasures (test 11) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dPsidXi[j][i] ) );
         }
 
         gradCol = ( resultGamma_P - resultGamma_M ) / ( 2 * delta[ i ] );
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_computeDeformationMeasures (test 12) * False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
     }
 
@@ -263,60 +206,38 @@ int test_computeDeformationMeasures( std::ofstream &results ){
                                                                            gradientMicroDeformation + delta,
                                                                            resultC_P, resultPsi_P, resultGamma_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error =  micromorphicLinearElasticity::computeDeformationMeasures( deformationGradient, microDeformation,
                                                                            gradientMicroDeformation - delta,
                                                                            resultC_M, resultPsi_M, resultGamma_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( resultC_P - resultC_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_computeDeformationMeasures (test 13) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         gradCol = ( resultPsi_P - resultPsi_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_computeDeformationMeasures (test 14) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         gradCol = ( resultGamma_P - resultGamma_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dGammadGradXi[j][i] ) ){
-                results << "test_computeDeformationMeasures (test 15) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dGammadGradXi[j][i] ) );
         }
     }
-
-
-
-    results << "test_computeDeformationMeasures & True\n";
-    return 0;
 }
 
-int test_computeLinearElasticTerm1( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeLinearElasticTerm1 ){
     /*!
      * Test the computation of the linear elastic term 1
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector greenLagrangeStrain = { -0.32573583,  0.23770061,  0.55626317,
@@ -371,15 +292,9 @@ int test_computeLinearElasticTerm1( std::ofstream &results ){
     errorOut error = micromorphicLinearElasticity::computeLinearElasticTerm1( greenLagrangeStrain, microStrain, 
                                                                               A, D, result );
 
-    if ( error ){
-        results << "test_computeLinearElasticTerm1 & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "test_computeLinearElasticTerm1 (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     //Test on the Jacobians
     variableVector resultJ;
@@ -390,15 +305,9 @@ int test_computeLinearElasticTerm1( std::ofstream &results ){
                                                                      dTerm1dGreenLagrangeStrain,
                                                                      dTerm1dMicroStrain );
 
-    if ( error ){
-        results << "test_computeLinearElasticTerm1 & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
-        results << "test_computeLinearElasticTerm1 (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     //Test dTerm1dGreenLagrangeStrain
     constantType eps = 1e-6;
@@ -411,26 +320,17 @@ int test_computeLinearElasticTerm1( std::ofstream &results ){
         error =  micromorphicLinearElasticity::computeLinearElasticTerm1( greenLagrangeStrain + delta, microStrain, 
                                                                               A, D, result_P );
 
-        if ( error ){
-            results << "test_computeLinearElasticTerm1 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error =  micromorphicLinearElasticity::computeLinearElasticTerm1( greenLagrangeStrain - delta, microStrain, 
                                                                               A, D, result_M );
 
-        if ( error ){
-            results << "test_computeLinearElasticTerm1 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm1dGreenLagrangeStrain[j][i] ) ){
-                results << "test_computeLinearElasticTerm1 (test 3) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm1dGreenLagrangeStrain[j][i] ) );
         }
     }
 
@@ -443,38 +343,25 @@ int test_computeLinearElasticTerm1( std::ofstream &results ){
         error =  micromorphicLinearElasticity::computeLinearElasticTerm1( greenLagrangeStrain, microStrain + delta, 
                                                                               A, D, result_P );
 
-        if ( error ){
-            results << "test_computeLinearElasticTerm1 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error =  micromorphicLinearElasticity::computeLinearElasticTerm1( greenLagrangeStrain, microStrain - delta, 
                                                                               A, D, result_M );
 
-        if ( error ){
-            results << "test_computeLinearElasticTerm1 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm1dMicroStrain[j][i] ) ){
-                results << "test_computeLinearElasticTerm1 (test 4) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm1dMicroStrain[j][i] ) );
         }
     }
-
-    results << "test_computeLinearElasticTerm1 & True\n";
-    return 0;
 }
 
-int test_computeLinearElasticTerm2( std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testComputeLinearElasticTerm2 ){
     /*!
      * Test the computation of term 2 for linear elasticity.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector greenLagrangeStrain = { -0.32573583,  0.23770061,  0.55626317,
@@ -534,18 +421,9 @@ int test_computeLinearElasticTerm2( std::ofstream &results){
     errorOut error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain, microStrain, invCPsi, 
                                                                               B, D, result );
 
-    if ( error ){
-        error->print();
-        results << "test_computeLinearElasticTerm2 & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( result, answer) ){
-        vectorTools::print( result );
-        vectorTools::print( answer );
-        results << "test_computeLinearElasticTerm2 (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer) );
 
     //Test the Jacobians
 
@@ -555,18 +433,9 @@ int test_computeLinearElasticTerm2( std::ofstream &results){
     error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain, microStrain, invCPsi,
                                                                      B, D, resultJ, dTerm2dE, dTerm2dMicroE, dTerm2dInvCPsi );
 
-    if ( error ){
-        error->print();
-        results << "test_computeLinearElasticTerm2 & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJ, answer) ){
-        vectorTools::print( result );
-        vectorTools::print( answer );
-        results << "test_computeLinearElasticTerm2 (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer) );
 
     //Test dTerm2dE
     constantType eps = 1e-6;
@@ -579,28 +448,17 @@ int test_computeLinearElasticTerm2( std::ofstream &results){
         error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain + delta, microStrain, invCPsi,
                                                                               B, D, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm2 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain - delta, microStrain, invCPsi,
                                                                               B, D, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm2 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm2dE[j][i] ) ){
-                results << "test_computeLinearElasticTerm2 (test 3) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm2dE[j][i] ) );
         }
     }
 
@@ -614,28 +472,17 @@ int test_computeLinearElasticTerm2( std::ofstream &results){
         error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain, microStrain + delta, invCPsi,
                                                                               B, D, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm2 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain, microStrain - delta, invCPsi,
                                                                               B, D, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm2 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm2dMicroE[j][i] ) ){
-                results << "test_computeLinearElasticTerm2 (test 4) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm2dMicroE[j][i] ) );
         }
     }
 
@@ -649,40 +496,25 @@ int test_computeLinearElasticTerm2( std::ofstream &results){
         error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain, microStrain, invCPsi + delta,
                                                                               B, D, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm2 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeLinearElasticTerm2( greenLagrangeStrain, microStrain, invCPsi - delta,
                                                                               B, D, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm2 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm2dInvCPsi[j][i] ) ){
-                results << "test_computeLinearElasticTerm2 (test 4) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm2dInvCPsi[j][i] ) );
         }
     }
-
-    results << "test_computeLinearElasticTerm2 & True\n";
-    return 0;
 }
 
-int test_computeReferenceHigherOrderStress( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeReferenceHigherOrderStress ){
     /*!
      * Test the computation of the higher order stress in the reference configuration.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector Gamma = { -0.31120922, -0.3563267 , -0.36573233, -0.0771914 , -0.24252804,
@@ -850,16 +682,9 @@ int test_computeReferenceHigherOrderStress( std::ofstream &results ){
 
     errorOut error = micromorphicLinearElasticity::computeReferenceHigherOrderStress( Gamma, C, result );
 
-    if ( error ){
-        error->print();
-        results << "test_computeReferenceHigherOrderStress & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "test_computeReferenceHigherOrderStress (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     //Test the Jacobian
 
@@ -867,16 +692,9 @@ int test_computeReferenceHigherOrderStress( std::ofstream &results ){
     variableMatrix dMdGamma;
     error = micromorphicLinearElasticity::computeReferenceHigherOrderStress( Gamma, C, resultJ, dMdGamma );
 
-    if ( error ){
-        error->print();
-        results << "test_computeReferenceHigherOrderStress & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
-        results << "test_computeReferenceHigherOrderStress (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     //Test dMdGamma
     constantType eps = 1e-6;
@@ -888,39 +706,24 @@ int test_computeReferenceHigherOrderStress( std::ofstream &results ){
 
         error = micromorphicLinearElasticity::computeReferenceHigherOrderStress( Gamma + delta, C, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeReferenceHigherOrderStress & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeReferenceHigherOrderStress( Gamma - delta, C, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeReferenceHigherOrderStress & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMdGamma[j][i] ) ){
-                results << "test_computeReferenceHigherOrderStress (test 3) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMdGamma[j][i] ) );
         }
     }
-
-    results << "test_computeReferenceHigherOrderStress & True\n";
-    return 0;
 }
 
-int test_computeLinearElasticTerm3( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeLinearElasticTerm3 ){
     /*!
      * Test the computation of the third term for micromorphic linear elasticity.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector invCGamma = { 3.50845589, -1.63297374,  1.45320064,  5.96175258,  3.87979583,
@@ -946,16 +749,9 @@ int test_computeLinearElasticTerm3( std::ofstream &results ){
     errorOut error = micromorphicLinearElasticity::computeLinearElasticTerm3( invCGamma, referenceHigherOrderStress, 
                                                                               result );
 
-    if ( error ){
-        error->print();
-        results << "test_computeLinearElasticTerm3 & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "test_computeLinearElasticTerm3 (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     //Test the Jacobians
 
@@ -965,16 +761,9 @@ int test_computeLinearElasticTerm3( std::ofstream &results ){
     error = micromorphicLinearElasticity::computeLinearElasticTerm3( invCGamma, referenceHigherOrderStress,
                                                                      resultJ, dTerm3dInvCGamma, dTerm3dM );
 
-    if ( error ){
-        error->print();
-        results << "test_computeLinearElasticTerm3 & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
-        results << "test_computeLinearElasticTerm3 (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     //Test dTerm3dInvCGamma
     constantType eps = 1e-6;
@@ -987,28 +776,17 @@ int test_computeLinearElasticTerm3( std::ofstream &results ){
         error = micromorphicLinearElasticity::computeLinearElasticTerm3( invCGamma + delta, referenceHigherOrderStress,
                                                                          result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm3 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeLinearElasticTerm3( invCGamma - delta, referenceHigherOrderStress,
                                                                          result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm3 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm3dInvCGamma[j][i] ) ){
-                results << "test_computeLinearElasticTerm3 (test 3) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm3dInvCGamma[j][i] ) );
         }
     }
 
@@ -1022,41 +800,26 @@ int test_computeLinearElasticTerm3( std::ofstream &results ){
         error = micromorphicLinearElasticity::computeLinearElasticTerm3( invCGamma, referenceHigherOrderStress + delta,
                                                                          result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm3 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeLinearElasticTerm3( invCGamma, referenceHigherOrderStress - delta,
                                                                          result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeLinearElasticTerm3 & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dTerm3dM[j][i] ) ){
-                results << "test_computeLinearElasticTerm3 (test 4) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dTerm3dM[j][i] ) );
         }
     }
-    
-    results << "test_computeLinearElasticTerm3 & True\n";
-    return 0;
 }
 
-int test_linearElasticityReferenceDerivedMeasures( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testLinearElasticityReferenceDerivedMeasures ){
     /*!
      * Test the micromorphic linear elastic constitutive model from the 
      * derived deformation measures.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector rightCauchyGreen = { 0.34852835, 0.47540122, 1.11252634,
@@ -1297,26 +1060,13 @@ int test_linearElasticityReferenceDerivedMeasures( std::ofstream &results ){
                                                                                              resultPK2Stress, resultMicroStress,
                                                                                              resultHigherOrderStress );
 
-    if ( error ){
-        error->print();
-        results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultPK2Stress, answerPK2Stress ) ){
-        results << "test_linearElasticityReferenceDerivedMeasures (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultPK2Stress, answerPK2Stress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress ) ){
-        results << "test_linearElasticityReferenceDerivedMeasures (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress ) ){
-        results << "test_linearElasticityReferenceDerivedMeasures (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress ) );
 
     variableVector resultPK2StressJ, resultMicroStressJ, resultHigherOrderStressJ;
     variableMatrix dPK2dRCG, dPK2dPsi, dPK2dGamma, dSigmadRCG, dSigmadPsi, dSigmadGamma, dMdGamma;
@@ -1329,26 +1079,13 @@ int test_linearElasticityReferenceDerivedMeasures( std::ofstream &results ){
                                                                                     dPK2dPsi, dPK2dGamma, dSigmadRCG,
                                                                                     dSigmadPsi, dSigmadGamma, dMdGamma );
 
-    if ( error ){
-        error->print();
-        results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultPK2StressJ, answerPK2Stress ) ){
-        results << "test_linearElasticityReferenceDerivedMeasures (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultPK2StressJ, answerPK2Stress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultMicroStressJ, answerMicroStress ) ){
-        results << "test_linearElasticityReferenceDerivedMeasures (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultMicroStressJ, answerMicroStress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultHigherOrderStressJ, answerHigherOrderStress ) ){
-        results << "test_linearElasticityReferenceDerivedMeasures (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultHigherOrderStressJ, answerHigherOrderStress ) );
 
     //Test the derivatives w.r.t. the right cauchy green deformation tensor
     constantType eps = 1e-6;
@@ -1363,46 +1100,29 @@ int test_linearElasticityReferenceDerivedMeasures( std::ofstream &results ){
                                                                                         A, B, C, D,
                                                                                         PK2P, SigmaP, MP );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticityReferenceDerivedMeasures( rightCauchyGreen - delta, Psi, Gamma,
                                                                                         A, B, C, D,
                                                                                         PK2M, SigmaM, MM );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( PK2P - PK2M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dPK2dRCG[ j ][ i ] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dPK2dRCG[ j ][ i ] ) );
         }
 
         gradCol = ( SigmaP - SigmaM ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dSigmadRCG[ j ][ i ] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 8) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dSigmadRCG[ j ][ i ] ) );
         }
 
         gradCol = ( MP - MM ) / ( 2 * delta[i] );
 
-        if ( !vectorTools::fuzzyEquals( gradCol, variableVector( gradCol.size(), 0 ) ) ){
-            results << "test_linearElasticityReferenceDerivedMeasures (test 9) & False\n";
-            return 1;
-        }
+        BOOST_CHECK( vectorTools::fuzzyEquals( gradCol, variableVector( gradCol.size(), 0 ) ) );
     }
 
     //Test the derivatives w.r.t. the micro deformation measure Psi
@@ -1417,46 +1137,29 @@ int test_linearElasticityReferenceDerivedMeasures( std::ofstream &results ){
                                                                                         A, B, C, D,
                                                                                         PK2P, SigmaP, MP );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticityReferenceDerivedMeasures( rightCauchyGreen, Psi - delta, Gamma,
                                                                                         A, B, C, D,
                                                                                         PK2M, SigmaM, MM );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( PK2P - PK2M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dPK2dPsi[ j ][ i ] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 10) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dPK2dPsi[ j ][ i ] ) );
         }
 
         gradCol = ( SigmaP - SigmaM ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dSigmadPsi[ j ][ i ] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 11) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dSigmadPsi[ j ][ i ] ) );
         }
 
         gradCol = ( MP - MM ) / ( 2 * delta[i] );
 
-        if ( !vectorTools::fuzzyEquals( gradCol, variableVector( gradCol.size(), 0 ) ) ){
-            results << "test_linearElasticityReferenceDerivedMeasures (test 12) & False\n";
-            return 1;
-        }
+        BOOST_CHECK( vectorTools::fuzzyEquals( gradCol, variableVector( gradCol.size(), 0 ) ) );
     }
 
     //Test the derivatives w.r.t. the higher order deformation measure Gamma
@@ -1471,59 +1174,38 @@ int test_linearElasticityReferenceDerivedMeasures( std::ofstream &results ){
                                                                                         A, B, C, D,
                                                                                         PK2P, SigmaP, MP );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticityReferenceDerivedMeasures( rightCauchyGreen, Psi, Gamma - delta,
                                                                                         A, B, C, D,
                                                                                         PK2M, SigmaM, MM );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReferenceDerivedMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( PK2P - PK2M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dPK2dGamma[ j ][ i ] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 13) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dPK2dGamma[ j ][ i ] ) );
         }
 
         gradCol = ( SigmaP - SigmaM ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dSigmadGamma[ j ][ i ] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 14) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dSigmadGamma[ j ][ i ] ) );
         }
 
         gradCol = ( MP - MM ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMdGamma[j][i] ) ){
-                results << "test_linearElasticityReferenceDerivedMeasures (test 15) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMdGamma[j][i] ) );
         }
     }
-
-    results << "test_linearElasticityReferenceDerivedMeasures & True\n";
-    return 0;
 }
 
-int test_linearElasticityReference( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testLinearElasticityReference ){
     /*!
      * Test the micromorphic linear elastic constitutive model.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector deformationGradient = { -0.50668478, -0.48303615, -1.43907185,
@@ -1765,26 +1447,13 @@ int test_linearElasticityReference( std::ofstream &results ){
                                                                               resultPK2Stress, resultMicroStress,
                                                                               resultHigherOrderStress );
 
-    if ( error ){
-        error->print();
-        results << "test_linearElasticityReference & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultPK2Stress, answerPK2Stress ) ){
-        results << "test_linearElasticityReference (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultPK2Stress, answerPK2Stress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress ) ){
-        results << "test_linearElasticityReference (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress ) ){
-        results << "test_linearElasticityReference (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress ) );
 
     //Test the Jacobians
 
@@ -1798,26 +1467,13 @@ int test_linearElasticityReference( std::ofstream &results ){
                                                                      dPK2dF, dPK2dXi, dPK2dGradXi, dSigmadF, dSigmadXi, dSigmadGradXi,
                                                                      dMdF, dMdGradXi );
 
-    if ( error ){
-        error->print();
-        results << "test_linearElasticityReference & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJPK2Stress, answerPK2Stress ) ){
-        results << "test_linearElasticityReference (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJPK2Stress, answerPK2Stress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultJMicroStress, answerMicroStress ) ){
-        results << "test_linearElasticityReference (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJMicroStress, answerMicroStress ) );
 
-    if ( !vectorTools::fuzzyEquals( resultJHigherOrderStress, answerHigherOrderStress ) ){
-        results << "test_linearElasticityReference (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJHigherOrderStress, answerHigherOrderStress ) );
 
     //Test Jacobians w.r.t. the deformation gradient
     constantType eps = 1e-6;
@@ -1834,48 +1490,31 @@ int test_linearElasticityReference( std::ofstream &results ){
                                                                          A, B, C, D,
                                                                          PK2_P, Sigma_P, M_P );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReference & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticityReference( deformationGradient - delta, microDeformation,
                                                                          gradientMicroDeformation,
                                                                          A, B, C, D,
                                                                          PK2_M, Sigma_M, M_M );
-
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReference & False\n";
-            return 1;
-        }
+        
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( PK2_P - PK2_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dPK2dF[j][i] ) ){
-                results << "test_linearElasticityReference (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dPK2dF[j][i] ) );
         }
 
         gradCol = ( Sigma_P - Sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dSigmadF[j][i] ) ){
-                results << "test_linearElasticityReference (test 8) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dSigmadF[j][i] ) );
         }
 
         gradCol = ( M_P - M_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMdF[j][i] ) ){
-                results << "test_linearElasticityReference (test 9) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMdF[j][i] ) );
         }
     }
 
@@ -1893,48 +1532,31 @@ int test_linearElasticityReference( std::ofstream &results ){
                                                                          A, B, C, D,
                                                                          PK2_P, Sigma_P, M_P );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReference & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticityReference( deformationGradient, microDeformation - delta,
                                                                          gradientMicroDeformation,
                                                                          A, B, C, D,
                                                                          PK2_M, Sigma_M, M_M );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReference & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( PK2_P - PK2_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dPK2dXi[j][i] ) ){
-                results << "test_linearElasticityReference (test 10) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dPK2dXi[j][i] ) );
         }
 
         gradCol = ( Sigma_P - Sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dSigmadXi[j][i] ) ){
-                results << "test_linearElasticityReference (test 11) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dSigmadXi[j][i] ) );
         }
 
         gradCol = ( M_P - M_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_linearElasticityReference (test 12) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
     }
 
@@ -1952,60 +1574,39 @@ int test_linearElasticityReference( std::ofstream &results ){
                                                                          A, B, C, D,
                                                                          PK2_P, Sigma_P, M_P );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReference & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticityReference( deformationGradient, microDeformation,
                                                                          gradientMicroDeformation - delta,
                                                                          A, B, C, D,
                                                                          PK2_M, Sigma_M, M_M );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticityReference & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( PK2_P - PK2_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dPK2dGradXi[j][i] ) ){
-                results << "test_linearElasticityReference (test 13) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dPK2dGradXi[j][i] ) );
         }
 
         gradCol = ( Sigma_P - Sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dSigmadGradXi[j][i], 1e-4 ) ){
-                results << "test_linearElasticityReference (test 14) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dSigmadGradXi[j][i], 1e-4 ) );
         }
 
         gradCol = ( M_P - M_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMdGradXi[j][i], 1e-4 ) ){
-                results << "test_linearElasticityReference (test 15) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMdGradXi[j][i], 1e-4 ) );
         }
     }
-
-    results << "test_linearElasticityReference & True\n";
-    return 0;
 }
 
-int test_computeInvRCGPsi( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeInvRCGPsi ){
     /*!
      * Test the computation of the invRCG Psi product
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector RCG = { 0.34852835, 0.47540122, 1.11252634,
@@ -2025,15 +1626,9 @@ int test_computeInvRCGPsi( std::ofstream &results ){
     variableVector result;
     errorOut error = micromorphicLinearElasticity::computeInvRCGPsi( invRCG, Psi, result );
 
-    if ( error ){
-        results << "test_computeInvRCGPsi & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "test_computeInvRCGPsi (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     //Test Jacobians
 
@@ -2042,16 +1637,9 @@ int test_computeInvRCGPsi( std::ofstream &results ){
 
     error = micromorphicLinearElasticity::computeInvRCGPsi( invRCG, Psi, resultJ, dInvRCGPsidRCG, dInvRCGPsidPsi );
 
-    if ( error ){
-        error->print();
-        results << "test_computeInvRCGPsi & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
-        results << "test_computeInvRCGPsi (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     // Test dInvRCGPsidRCG
     constantType eps = 1e-6;
@@ -2065,29 +1653,18 @@ int test_computeInvRCGPsi( std::ofstream &results ){
 
         error = micromorphicLinearElasticity::computeInvRCGPsi( invRCG_P, Psi, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGPsi & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector invRCG_M = vectorTools::inverse( RCG - delta, 3, 3 );
 
         error = micromorphicLinearElasticity::computeInvRCGPsi( invRCG_M, Psi, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGPsi & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dInvRCGPsidRCG[j][i] ) ){
-                results << "test_computeInvRCGPsi (test 3) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dInvRCGPsidRCG[j][i] ) );
         }
     }
 
@@ -2100,39 +1677,24 @@ int test_computeInvRCGPsi( std::ofstream &results ){
 
         error = micromorphicLinearElasticity::computeInvRCGPsi( invRCG, Psi + delta, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGPsi & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeInvRCGPsi( invRCG, Psi - delta, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGPsi & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dInvRCGPsidPsi[j][i] ) ){
-                results << "test_computeInvRCGPsi (test 4) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dInvRCGPsidPsi[j][i] ) );
         }
     }
-
-    results << "test_computeInvRCGPsi & True\n";
-    return 0;
 }
 
-int test_computeInvRCGGamma( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeInvRCGGamma ){
     /*!
      * Test the computation of the invRCG Gamma product
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector RCG = { 0.34852835, 0.47540122, 1.11252634,
@@ -2159,15 +1721,9 @@ int test_computeInvRCGGamma( std::ofstream &results ){
     variableVector result;
     errorOut error = micromorphicLinearElasticity::computeInvRCGGamma( invRCG, Gamma, result );
 
-    if ( error ){
-        results << "test_computeInvRCGGamma & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "test_computeInvRCGGamma (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     //Test Jacobians
 
@@ -2176,16 +1732,9 @@ int test_computeInvRCGGamma( std::ofstream &results ){
 
     error = micromorphicLinearElasticity::computeInvRCGGamma( invRCG, Gamma, resultJ, dInvRCGGammadRCG, dInvRCGGammadGamma );
 
-    if ( error ){
-        error->print();
-        results << "test_computeInvRCGGamma & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
-        results << "test_computeInvRCGGamma (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     // Test dInvRCGGammadRCG
     constantType eps = 1e-6;
@@ -2199,29 +1748,18 @@ int test_computeInvRCGGamma( std::ofstream &results ){
 
         error = micromorphicLinearElasticity::computeInvRCGGamma( invRCG_P, Gamma, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGGamma & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector invRCG_M = vectorTools::inverse( RCG - delta, 3, 3 );
 
         error = micromorphicLinearElasticity::computeInvRCGGamma( invRCG_M, Gamma, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGGamma & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dInvRCGGammadRCG[j][i] ) ){
-                results << "test_computeInvRCGGamma (test 3) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dInvRCGGammadRCG[j][i] ) );
         }
     }
 
@@ -2234,40 +1772,25 @@ int test_computeInvRCGGamma( std::ofstream &results ){
 
         error = micromorphicLinearElasticity::computeInvRCGGamma( invRCG, Gamma + delta, result_P );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGGamma & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::computeInvRCGGamma( invRCG, Gamma - delta, result_M );
 
-        if ( error ){
-            error->print();
-            results << "test_computeInvRCGGamma & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         constantVector gradCol = ( result_P - result_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dInvRCGGammadGamma[j][i] ) ){
-                results << "test_computeInvRCGGamma (test 4) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dInvRCGGammadGamma[j][i] ) );
         }
     }
-
-    results << "test_computeInvRCGGamma & True\n";
-    return 0;
 }
 
-int test_mapStressesToCurrent( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testMapStressesToCurrent ){
     /*!
      * Test mapping the stresses from the reference configuration 
      * to the current configuration.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector PK2Stress = { 314.71116295,   30.09663087,  -97.50775502,
@@ -2316,26 +1839,13 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                                referenceHigherOrderStress, resultCauchyStress,
                                                                                resultMicroStress, resultHigherOrderStress );
 
-    if ( error ){
-        error->print();
-        results << "test_mapStressesToCurrent & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultCauchyStress, answerCauchyStress, 1e-5 ) ){
-        results << "test_mapStressesToCurrent (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultCauchyStress, answerCauchyStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress, 1e-5 ) ){
-        results << "test_mapStressesToCurrent (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress, 1e-5 ) ){
-        results << "test_mapStressesToCurrent (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress, 1e-5 ) );
 
     //Test the Jacobians
 
@@ -2354,26 +1864,13 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                       dHigherOrderStressdF, dHigherOrderStressdXi,
                                                                       dHigherOrderStressdReferenceHigherOrderStress );
 
-    if ( error ){
-        error->print();
-        results << "test_mapStressesToCurrent & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJCauchyStress, answerCauchyStress, 1e-5 ) ){
-        results << "test_mapStressesToCurrent (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJCauchyStress, answerCauchyStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultJMicroStress, answerMicroStress, 1e-5 ) ){
-        results << "test_mapStressesToCurrent (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJMicroStress, answerMicroStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultJHigherOrderStress, answerHigherOrderStress, 1e-5 ) ){
-        results << "test_mapStressesToCurrent (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJHigherOrderStress, answerHigherOrderStress, 1e-5 ) );
 
     //Test Jacobians w.r.t. the deformation gradient
     constantType eps = 1e-6;
@@ -2388,50 +1885,33 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                           PK2Stress, referenceMicroStress, referenceHigherOrderStress,
                                                                           result_sigma_P, result_s_P, result_m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::mapStressMeasuresToCurrent( deformationGradient - delta, microDeformation,
                                                                           PK2Stress, referenceMicroStress, referenceHigherOrderStress,
                                                                           result_sigma_M, result_s_M, result_m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( result_sigma_P - result_sigma_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdF[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdF[j][i] ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( result_s_P - result_s_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMicroStressdF[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 8) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMicroStressdF[j][i] ) );
         }
 
         //Test higher order stress
         gradCol = ( result_m_P - result_m_M ) / ( 2 * delta[i] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdF[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 9) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdF[j][i] ) );
         }
     }
 
@@ -2447,50 +1927,33 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                           PK2Stress, referenceMicroStress, referenceHigherOrderStress,
                                                                           result_sigma_P, result_s_P, result_m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::mapStressMeasuresToCurrent( deformationGradient, microDeformation - delta,
                                                                           PK2Stress, referenceMicroStress, referenceHigherOrderStress,
                                                                           result_sigma_M, result_s_M, result_m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( result_sigma_P - result_sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 10) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( result_s_P - result_s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 11) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         //Test higher order stress
         gradCol = ( result_m_P - result_m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdXi[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 12) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdXi[j][i] ) );
         }
     }
 
@@ -2507,51 +1970,34 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                           referenceHigherOrderStress,
                                                                           result_sigma_P, result_s_P, result_m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::mapStressMeasuresToCurrent( deformationGradient, microDeformation,
                                                                           PK2Stress - delta, referenceMicroStress,
                                                                           referenceHigherOrderStress,
                                                                           result_sigma_M, result_s_M, result_m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( result_sigma_P - result_sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdPK2Stress[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 13) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdPK2Stress[j][i] ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( result_s_P - result_s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 14) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         //Test higher order stress
         gradCol = ( result_m_P - result_m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 15) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
     }
 
@@ -2568,51 +2014,34 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                           referenceHigherOrderStress,
                                                                           result_sigma_P, result_s_P, result_m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::mapStressMeasuresToCurrent( deformationGradient, microDeformation,
                                                                           PK2Stress, referenceMicroStress - delta,
                                                                           referenceHigherOrderStress,
                                                                           result_sigma_M, result_s_M, result_m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( result_sigma_P - result_sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 16) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( result_s_P - result_s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMicroStressdReferenceMicroStress[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 17) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMicroStressdReferenceMicroStress[j][i] ) );
         }
 
         //Test higher order stress
         gradCol = ( result_m_P - result_m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 18) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
     }
 
@@ -2629,64 +2058,43 @@ int test_mapStressesToCurrent( std::ofstream &results ){
                                                                           referenceHigherOrderStress + delta,
                                                                           result_sigma_P, result_s_P, result_m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::mapStressMeasuresToCurrent( deformationGradient, microDeformation,
                                                                           PK2Stress, referenceMicroStress,
                                                                           referenceHigherOrderStress - delta,
                                                                           result_sigma_M, result_s_M, result_m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_mapStressesToCurrent & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( result_sigma_P - result_sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 19) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( result_s_P - result_s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], 0. ) ){
-                results << "test_mapStressesToCurrent (test 20) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], 0. ) );
         }
 
         //Test higher order stress
         gradCol = ( result_m_P - result_m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdReferenceHigherOrderStress[j][i] ) ){
-                results << "test_mapStressesToCurrent (test 21) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdReferenceHigherOrderStress[j][i] ) );
         }
     }
-
-    results << "test_mapStressesToCurrent & True\n";
-    return 0;
 }
 
-int test_linearElasticity( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testLinearElasticity ){
     /*!
      * Test the micro-morphic linear elasticity model where the 
      * stresses are pushed to the current configuration.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     variableVector deformationGradient = { -0.50668478, -0.48303615, -1.43907185,
@@ -2929,26 +2337,13 @@ int test_linearElasticity( std::ofstream &results ){
                                                                      resultCauchyStress, resultMicroStress,
                                                                      resultHigherOrderStress );
 
-    if ( error ){
-        error->print();
-        results << "test_linearElasticity & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultCauchyStress, answerCauchyStress, 1e-5 ) ){
-        results << "test_linearElasticity (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultCauchyStress, answerCauchyStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress, 1e-5 ) ){
-        results << "test_linearElasticity (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultMicroStress, answerMicroStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress, 1e-5 ) ){
-        results << "test_linearElasticity (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultHigherOrderStress, answerHigherOrderStress, 1e-5 ) );
 
     //Test the Jacobians
 
@@ -2966,26 +2361,13 @@ int test_linearElasticity( std::ofstream &results ){
                                                             dMicroStressdF, dMicroStressdXi, dMicroStressdGradXi,
                                                             dHigherOrderStressdF, dHigherOrderStressdXi, dHigherOrderStressdGradXi );
 
-    if ( error ){
-        error->print();
-        results << "test_mapStressesToCurrent & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultJCauchyStress, answerCauchyStress, 1e-5 ) ){
-        results << "test_linearElasticity (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJCauchyStress, answerCauchyStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultJMicroStress, answerMicroStress, 1e-5 ) ){
-        results << "test_linearElasticity (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJMicroStress, answerMicroStress, 1e-5 ) );
 
-    if ( !vectorTools::fuzzyEquals( resultJHigherOrderStress, answerHigherOrderStress, 1e-5 ) ){
-        results << "test_linearElasticity (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJHigherOrderStress, answerHigherOrderStress, 1e-5 ) );
 
     //Test the Jacobians w.r.t. the deformation gradient
     constantType eps = 1e-6;
@@ -3001,51 +2383,34 @@ int test_linearElasticity( std::ofstream &results ){
                                                                 A, B, C, D,
                                                                 sigma_P, s_P, m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticity & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticity( deformationGradient - delta, microDeformation,
                                                                 gradientMicroDeformation,
                                                                 A, B, C, D,
                                                                 sigma_M, s_M, m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticity & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( sigma_P - sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdF[j][i] ) ){
-                results << "test_linearElasticity (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdF[j][i] ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( s_P - s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMicroStressdF[j][i] ) ){
-                results << "test_linearElasticity (test 8) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMicroStressdF[j][i] ) );
         }
 
         //Test higher order stress
         gradCol = ( m_P - m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdF[j][i] ) ){
-                results << "test_linearElasticity (test 9) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdF[j][i] ) );
         }
     }
 
@@ -3062,51 +2427,34 @@ int test_linearElasticity( std::ofstream &results ){
                                                                 A, B, C, D,
                                                                 sigma_P, s_P, m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticity & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticity( deformationGradient, microDeformation - delta,
                                                                 gradientMicroDeformation,
                                                                 A, B, C, D,
                                                                 sigma_M, s_M, m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticity & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( sigma_P - sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdXi[j][i] ) ){
-                results << "test_linearElasticity (test 10) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdXi[j][i] ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( s_P - s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMicroStressdXi[j][i] ) ){
-                results << "test_linearElasticity (test 11) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMicroStressdXi[j][i] ) );
         }
 
         //Test higher order stress
         gradCol = ( m_P - m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdXi[j][i] ) ){
-                results << "test_linearElasticity (test 12) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdXi[j][i] ) );
         }
     }
 
@@ -3123,63 +2471,42 @@ int test_linearElasticity( std::ofstream &results ){
                                                                 A, B, C, D,
                                                                 sigma_P, s_P, m_P );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticity & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::linearElasticity( deformationGradient, microDeformation,
                                                                 gradientMicroDeformation - delta,
                                                                 A, B, C, D,
                                                                 sigma_M, s_M, m_M );
 
-        if ( error ){
-            error->print();
-            results << "test_linearElasticity & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         //Test Cauchy Stress
         constantVector gradCol = ( sigma_P - sigma_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdGradXi[j][i] ) ){
-                results << "test_linearElasticity (test 13) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dCauchyStressdGradXi[j][i] ) );
         }
 
         //Test symmetric micro stress
         gradCol = ( s_P - s_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dMicroStressdGradXi[j][i] ) ){
-                results << "test_linearElasticity (test 14) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dMicroStressdGradXi[j][i] ) );
         }
 
         //Test higher order stress
         gradCol = ( m_P - m_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdGradXi[j][i] ) ){
-                results << "test_linearElasticity (test 15) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[j], dHigherOrderStressdGradXi[j][i] ) );
         }
     }
-
-    results << "test_linearElasticity & True\n";
-    return 0;
 }
 
-int test_formIsotropicA( std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testFormIsotropicA ){
     /*!
      * Test the formation of the isotropic A stiffness tensor.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     parameterType lambda = 4;
@@ -3197,26 +2524,15 @@ int test_formIsotropicA( std::ofstream &results){
 
     errorOut error = micromorphicLinearElasticity::formIsotropicA( lambda, mu, result );
 
-    if ( error ){
-        error->print();
-        results << "test_formIsotropicA & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( answer, result ) ){
-        results << "test_formIsotropicA (test 1) & False\n";
-        return 1;
-    }
-
-    results << "test_formIsotropicA & True\n";
-    return 0;
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, result ) );
 }
 
-int test_formIsotropicB( std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testFormIsotropicB ){
     /*!
      * Test the formation of the isotropic B stiffness tensor.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     parameterType eta = 3;
@@ -3237,26 +2553,15 @@ int test_formIsotropicB( std::ofstream &results){
 
     errorOut error = micromorphicLinearElasticity::formIsotropicB( eta, tau, kappa, nu, sigma, result );
 
-    if ( error ){
-        error->print();
-        results << "test_formIsotropicB & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( answer, result ) ){
-        results << "test_formIsotropicB (test 1) & False\n";
-        return 1;
-    }
-
-    results << "test_formIsotropicB & True\n";
-    return 0;
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, result ) );
 }
 
-int test_formIsotropicC( std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testFormIsotropicC ){
     /*!
      * Test the formation of the isotropic C stiffness tensor.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     parameterVector taus = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
@@ -3325,26 +2630,15 @@ int test_formIsotropicC( std::ofstream &results){
 
     errorOut error = micromorphicLinearElasticity::formIsotropicC( taus, result );
 
-    if ( error ){
-        error->print();
-        results << "test_formIsotropicC & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( answer, result ) ){
-        results << "test_formIsotropicC (test 1) & False\n";
-        return 1;
-    }
-
-    results << "test_formIsotropicC & True\n";
-    return 0;
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, result ) );
 }
 
-int test_formIsotropicD( std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testFormIsotropicD ){
     /*!
      * Test the formation of the isotropic D stiffness tensor.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     parameterType tau = 5;
@@ -3362,26 +2656,15 @@ int test_formIsotropicD( std::ofstream &results){
 
     errorOut error = micromorphicLinearElasticity::formIsotropicD( tau, sigma, result );
 
-    if ( error ){
-        error->print();
-        results << "test_formIsotropicD & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( answer, result ) ){
-        results << "test_formIsotropicD (test 1) & False\n";
-        return 1;
-    }
-
-    results << "test_formIsotropicD & True\n";
-    return 0;
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, result ) );
 }
 
-int test_assembleFundamentalDeformationMeasures( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testAssembleFundamentalDeformationMeasures ){
     /*!
      * Assemble the fundamental deformation measures from the degrees of freedom.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     double grad_u[ 3 ][ 3 ] = { { 1, 2, 3 },
@@ -3413,25 +2696,13 @@ int test_assembleFundamentalDeformationMeasures( std::ofstream &results ){
     errorOut error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( grad_u, phi, grad_phi,
                                                                                            resultF, resultChi, resultGradChi );
 
-    if ( error ){
-        results << "test_assembleFundamentalDeformationMeasures & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultF, answerDeformationGradient ) ){
-        results << "test_assembleFundamentalDeformationMeasures (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultF, answerDeformationGradient ) );
 
-    if ( !vectorTools::fuzzyEquals( resultChi, answerMicroDeformation ) ){
-        results << "test_assembleFundamentalDeformationMeasures (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultChi, answerMicroDeformation ) );
 
-    if ( !vectorTools::fuzzyEquals( resultGradChi, answerGradientMicroDeformation ) ){
-        results << "test_assembleFundamentalDeformationMeasures (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultGradChi, answerGradientMicroDeformation ) );
 
     //Test the Jacobians
     variableVector resultFJ, resultChiJ, resultGradChiJ;
@@ -3441,25 +2712,13 @@ int test_assembleFundamentalDeformationMeasures( std::ofstream &results ){
                                                                                   resultFJ, resultChiJ, resultGradChiJ,
                                                                                   dFdGradU, dChidPhi, dGradChidGradPhi );
 
-    if ( error ){
-        results << "test_assembleFundamentalDeformationMeasures & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( resultFJ, answerDeformationGradient ) ){
-        results << "test_assembleFundamentalDeformationMeasures (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultFJ, answerDeformationGradient ) );
 
-    if ( !vectorTools::fuzzyEquals( resultChiJ, answerMicroDeformation ) ){
-        results << "test_assembleFundamentalDeformationMeasures (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultChiJ, answerMicroDeformation ) );
 
-    if ( !vectorTools::fuzzyEquals( resultGradChiJ, answerGradientMicroDeformation ) ){
-        results << "test_assembleFundamentalDeformationMeasures (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultGradChiJ, answerGradientMicroDeformation ) );
 
     //Test the jacobians w.r.t. the gradient of the displacement
     constantType eps = 1e-6;
@@ -3490,41 +2749,29 @@ int test_assembleFundamentalDeformationMeasures( std::ofstream &results ){
         error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( positive_perturb, phi, grad_phi,
                                                                                       FP, chiP, gradChiP );
 
-        if ( error ){
-            results << "test_assembleFundamentalDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( negative_perturb, phi, grad_phi,
                                                                                       FM, chiM, gradChiM );
 
-        if ( error ){
-            results << "test_assembleFundamentalDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
+
         variableVector gradCol = ( FP - FM ) / ( 2 * delta[ ii ][ ij ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dFdGradU[ j ][ i ] ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdGradU[ j ][ i ] ) );
         }
 
         gradCol = ( chiP - chiM ) / ( 2 * delta[ ii ][ ij ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 8) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
 
         gradCol = ( gradChiP - gradChiM ) / ( 2 * delta[ ii ][ ij ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 9) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
     }
 
@@ -3547,41 +2794,29 @@ int test_assembleFundamentalDeformationMeasures( std::ofstream &results ){
         error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( grad_u, positive_perturb, grad_phi,
                                                                                       FP, chiP, gradChiP );
 
-        if ( error ){
-            results << "test_assembleFundamentalDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( grad_u, negative_perturb, grad_phi,
                                                                                       FM, chiM, gradChiM );
 
-        if ( error ){
-            results << "test_assembleFundamentalDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
+
         variableVector gradCol = ( FP - FM ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 10) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
 
         gradCol = ( chiP - chiM ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dChidPhi[ j ][ i ] ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 11) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dChidPhi[ j ][ i ] ) );
         }
 
         gradCol = ( gradChiP - gradChiM ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 12) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
     }
 
@@ -3624,54 +2859,37 @@ int test_assembleFundamentalDeformationMeasures( std::ofstream &results ){
         error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( grad_u, phi, positive_perturb,
                                                                                       FP, chiP, gradChiP );
 
-        if ( error ){
-            results << "test_assembleFundamentalDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         error = micromorphicLinearElasticity::assembleFundamentalDeformationMeasures( grad_u, phi, negative_perturb,
                                                                                       FM, chiM, gradChiM );
 
-        if ( error ){
-            results << "test_assembleFundamentalDeformationMeasures & False\n";
-            return 1;
-        }
+        BOOST_CHECK( !error );
 
         variableVector gradCol = ( FP - FM ) / ( 2 * delta[ ii ][ ij ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 13) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
 
         gradCol = ( chiP - chiM ) / ( 2 * delta[ ii ][ ij ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], 0. ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 14) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], 0. ) );
         }
 
         gradCol = ( gradChiP - gradChiM ) / ( 2 * delta[ ii ][ ij ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dGradChidGradPhi[ j ][ i ] ) ){
-                results << "test_assembleFundamentalDeformationMeasures (test 15) & False\n";
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dGradChidGradPhi[ j ][ i ] ) );
         }
     }
-
-    results << "test_assembleFundamentalDeformationMeasures & True\n";
-    return 0;
 }
 
-int test_cout_redirect( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testCoutRedirect ){
     /*!
      * Test the utility function which redirects cout to a string buffer.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     std::stringbuf buffer;
@@ -3681,20 +2899,13 @@ int test_cout_redirect( std::ofstream &results ){
 
     std::cout << answer;
 
-    if ( answer.compare( buffer.str() ) != 0 ){
-        results << "test_cout_redirect (test 1) & False\n";
-        return 1;
-    }
-
-    results << "test_cout_redirect & True\n";
-    return 0;
+    BOOST_CHECK( answer.compare( buffer.str() ) == 0 );
 }
 
-int test_cerr_redirect( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testCerrRedirect ){
     /*!
      * Test the utility function which redirects cerr to a string buffer.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     std::stringbuf buffer;
@@ -3704,20 +2915,13 @@ int test_cerr_redirect( std::ofstream &results ){
 
     std::cerr << answer;
 
-    if ( answer.compare( buffer.str() ) != 0 ){
-        results << "test_cerr_redirect (test 1) & False\n";
-        return 1;
-    }
-
-    results << "test_cerr_redirect & True\n";
-    return 0;
+    BOOST_CHECK( answer.compare( buffer.str() ) == 0 );
 }
 
-int test_extractMaterialParameters( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testExtractMaterialParameters ){
     /*!
      * Test the extraction of the material parameters.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     std::vector< double > fparams = { 2, 1.7, 1.8,
@@ -3735,72 +2939,36 @@ int test_extractMaterialParameters( std::ofstream &results ){
     parameterVector answerCmatrix;
     parameterVector answerDmatrix;
 
-   errorOut error = micromorphicLinearElasticity::formIsotropicA( 1.7, 1.8, answerAmatrix );
-    if ( error ){
-        error->print();
-        results << "test_extractMaterialParameters & False\n";
-        return 1;
-    }
+    errorOut error = micromorphicLinearElasticity::formIsotropicA( 1.7, 1.8, answerAmatrix );
+    BOOST_CHECK( !error );
 
     error = micromorphicLinearElasticity::formIsotropicB( 2.8, 0.76, 0.15, 9.8, 5.4, answerBmatrix );
-    if ( error ){
-        error->print();
-        results << "test_extractMaterialParameters & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
     error = micromorphicLinearElasticity::formIsotropicC( { 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11.}, answerCmatrix );
-    if ( error ){
-        error->print();
-        results << "test_extractMaterialParameters & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
     error = micromorphicLinearElasticity::formIsotropicD( 0.76, 5.4, answerDmatrix );
-    if ( error ){
-        error->print();
-        results << "test_extractMaterialParameters & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
     error = micromorphicLinearElasticity::extractMaterialParameters( fparams, Amatrix, Bmatrix, Cmatrix, Dmatrix );
 
-    if ( error ){
-        error->print();
-        results << "test_extractMaterialParameters & False\n";
-        return 1;
-    }
+    BOOST_CHECK( !error );
 
-    if ( !vectorTools::fuzzyEquals( Amatrix, answerAmatrix ) ){
-        results << "test_extractMaterialParameters (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( Amatrix, answerAmatrix ) );
 
-    if ( !vectorTools::fuzzyEquals( Bmatrix, answerBmatrix ) ){
-        results << "test_extractMaterialParameters (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( Bmatrix, answerBmatrix ) );
 
-    if ( !vectorTools::fuzzyEquals( Cmatrix, answerCmatrix ) ){
-        results << "test_extractMaterialParameters (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( Cmatrix, answerCmatrix ) );
 
-    if ( !vectorTools::fuzzyEquals( Dmatrix, answerDmatrix ) ){
-        results << "test_extractMaterialParameters (test 4) & False\n";
-        return 1;
-    }
-
-    results << "test_extractMaterialParameters & True\n";
-    return 0;
+    BOOST_CHECK( vectorTools::fuzzyEquals( Dmatrix, answerDmatrix ) );
 }
 
-int test_evaluate_model( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testEvaluateModel ){
     /*!
      * Test the model evaluation interface for the stresses computed
      * in the reference configuration.
      *
-     * :param std::ofstream &results: The output file.
      */
 
     const std::vector< double > time = { 10, 2.7 };
@@ -3878,29 +3046,13 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-    if ( errorCode > 0 ){
-        std::cout << output_message << "\n";
-        results << "test_evaluate_model & False\n";
-        return 1;
-    }
+    BOOST_CHECK( errorCode <= 0 );
 
-    if ( !vectorTools::fuzzyEquals( PK2_result, PK2_answer ) ){
-        vectorTools::print( PK2_result - PK2_answer );
-        results << "test_evaluate_model (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( PK2_result, PK2_answer ) );
 
-    if ( !vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) ){
-        vectorTools::print( SIGMA_result - SIGMA_answer );
-        results << "test_evaluate_model (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) );
 
-    if ( !vectorTools::fuzzyEquals( M_result, M_answer ) ){
-        vectorTools::print( M_result -  M_answer );
-        results << "test_evaluate_model (test 3) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( M_result, M_answer ) );
 
     //Test of the Jacobians
     PK2_result.clear();
@@ -3925,29 +3077,13 @@ int test_evaluate_model( std::ofstream &results ){
                                                                ADD_TERMS, ADD_JACOBIANS, output_message
                                                              );
 
-    if ( errorCode > 0 ){
-        std::cout << output_message << "\n";
-        results << "test_evaluate_model & False\n";
-        return 1;
-    }
+    BOOST_CHECK( errorCode <= 0 );
 
-    if ( !vectorTools::fuzzyEquals( PK2_result, PK2_answer ) ){
-        vectorTools::print( PK2_result - PK2_answer );
-        results << "test_evaluate_model (test 4) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( PK2_result, PK2_answer ) );
 
-    if ( !vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) ){
-        vectorTools::print( SIGMA_result - SIGMA_answer );
-        results << "test_evaluate_model (test 5) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) );
 
-    if ( !vectorTools::fuzzyEquals( M_result, M_answer ) ){
-        vectorTools::print( M_result -  M_answer );
-        results << "test_evaluate_model (test 6) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( M_result, M_answer ) );
 
     //Test the jacobians w.r.t. the gradient of the macro displacement
     constantType eps = 1e-6;
@@ -3980,11 +3116,7 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-        if ( errorCode > 0 ){
-            std::cout << output_message << "\n";
-            results << "test_evaluate_model & False\n";
-            return 1;
-        }
+        BOOST_CHECK( errorCode <= 0 );
 
         errorCode = micromorphicLinearElasticity::evaluate_model( time, fparams, current_grad_u_M, current_phi, current_grad_phi,
                                                                    previous_grad_u, previous_phi, previous_grad_phi,
@@ -3994,43 +3126,30 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-        if ( errorCode > 0 ){
-            std::cout << output_message << "\n";
-            results << "test_evaluate_model & False\n";
-            return 1;
-        }
+        BOOST_CHECK( errorCode <= 0 );
 
         std::vector< double > gradCol = ( PK2_P - PK2_M ) / ( 2 * delta[ i / 3 ][ i % 3 ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DPK2Dgrad_u[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 7) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DPK2Dgrad_u[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
 
         gradCol = ( SIGMA_P - SIGMA_M ) / ( 2 * delta[ i / 3 ][ i % 3 ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DSIGMADgrad_u[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 8) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DSIGMADgrad_u[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
 
         gradCol = ( M_P - M_M ) / ( 2 * delta[ i / 3 ][ i % 3 ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DMDgrad_u[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 9) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DMDgrad_u[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
     }
 
@@ -4058,11 +3177,7 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-        if ( errorCode > 0 ){
-            std::cout << output_message << "\n";
-            results << "test_evaluate_model & False\n";
-            return 1;
-        }
+        BOOST_CHECK( errorCode <= 0 );
 
         errorCode = micromorphicLinearElasticity::evaluate_model( time, fparams, current_grad_u, current_phi_M, current_grad_phi,
                                                                    previous_grad_u, previous_phi, previous_grad_phi,
@@ -4072,43 +3187,30 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-        if ( errorCode > 0 ){
-            std::cout << output_message << "\n";
-            results << "test_evaluate_model & False\n";
-            return 1;
-        }
+        BOOST_CHECK( errorCode <= 0 );
 
         std::vector< double > gradCol = ( PK2_P - PK2_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DPK2Dphi[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 10) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DPK2Dphi[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
 
         gradCol = ( SIGMA_P - SIGMA_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DSIGMADphi[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 11) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DSIGMADphi[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
 
         gradCol = ( M_P - M_M ) / ( 2 * delta[ i ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DMDphi[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 12) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DMDphi[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
     }
 
@@ -4153,11 +3255,7 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-        if ( errorCode > 0 ){
-            std::cout << output_message << "\n";
-            results << "test_evaluate_model & False\n";
-            return 1;
-        }
+        BOOST_CHECK( errorCode <= 0 );
 
         errorCode = micromorphicLinearElasticity::evaluate_model( time, fparams, current_grad_u, current_phi, current_grad_phi_M,
                                                                    previous_grad_u, previous_phi, previous_grad_phi,
@@ -4167,405 +3265,30 @@ int test_evaluate_model( std::ofstream &results ){
                                                                    ADD_TERMS, output_message
                                                                  );
 
-        if ( errorCode > 0 ){
-            std::cout << output_message << "\n";
-            results << "test_evaluate_model & False\n";
-            return 1;
-        }
+        BOOST_CHECK( errorCode <= 0 );
 
         std::vector< double > gradCol = ( PK2_P - PK2_M ) / ( 2 * delta[ i / 3 ][ i % 3 ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DPK2Dgrad_phi[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 13) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DPK2Dgrad_phi[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
 
         gradCol = ( SIGMA_P - SIGMA_M ) / ( 2 * delta[ i / 3 ][ i % 3 ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DSIGMADgrad_phi[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 14) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DSIGMADgrad_phi[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
 
         gradCol = ( M_P - M_M ) / ( 2 * delta[ i / 3 ][ i % 3 ] );
 
         for ( unsigned int j = 0; j < gradCol.size(); j++ ){
-            if ( !vectorTools::fuzzyEquals( gradCol[ j ],
-                                            DMDgrad_phi[ j ][ i ],
-                                            1e-6, 1e-9 ) ){
-                results << "test_evaluate_model (test 15) & False\n";
-                return 1;
-            }
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ],
+                                                   DMDgrad_phi[ j ][ i ],
+                                                   1e-6, 1e-9 ) );
         }
     }
-
-    results << "test_evaluate_model & True\n";
-    return 0;
-}
-
-int test_materialLibraryInterface( std::ofstream &results ){
-    /*!
-     * Test the interface to the linear elastic model
-     * via the material library.
-     *
-     * :param std::ofstream &results: The output file.
-     */
-
-    //Initialize the model
-    std::string _model_name = "LinearElasticity";
-    auto &factory = micromorphic_material_library::MaterialFactory::Instance();
-    auto material = factory.GetMaterial(_model_name);
-
-    //Set up the inputs
-    const std::vector< double > time = { 10, 2.7 };
-
-    const std::vector< double > fparams = { 2, 1.7, 1.8,
-                                            5, 2.8, .76, .15, 9.8, 5.4,
-                                           11, 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11.,
-                                            2, .76, 5.4 };
-
-    const double current_grad_u[ 3 ][ 3 ] = { { -1.07901185, -1.09656192, -0.04629144 },
-                                              { -0.77749189, -1.27877771, -0.82648234 },
-                                              {  0.66484637, -0.05552567, -1.65125738 } };
-
-    const double current_phi[ 9 ] = { -1.40391532, -0.42715691,  0.75393369,
-                                       0.2849511 , -2.06484257, -0.52190902,
-                                       1.07238446,  0.19155907, -0.39704566 };
-
-    const double current_grad_phi[ 9 ][ 3 ] = { { 0.14940184, 0.12460812, 0.31971128 },
-                                                { 0.67550862, 0.61095383, 0.87972732 },
-                                                { 0.30872424, 0.32158187, 0.25480281 },
-                                                { 0.45570006, 0.69090695, 0.72388584 },
-                                                { 0.14880964, 0.67520596, 0.15106516 },
-                                                { 0.77810545, 0.07641724, 0.09367471 },
-                                                { 0.15905979, 0.0651695 , 0.52150417 },
-                                                { 0.91873444, 0.5622355 , 0.50199447 },
-                                                { 0.26729942, 0.89858519, 0.09043229 } };
-
-    const double previous_grad_u[ 3 ][ 3 ] = { { 0, 0, 0},
-                                               { 0, 0, 0},
-                                               { 0, 0, 0} };
-
-    const double previous_phi[ 9 ] = { 0, 0, 0,
-                                       0, 0, 0,
-                                       0, 0, 0 };
-
-    const double previous_grad_phi[ 9 ][ 3 ] = { { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0},
-                                                 { 0, 0, 0} };
-
-
-    std::vector< double > SDVS;
-    const std::vector< double > current_ADD_DOF, previous_ADD_DOF;
-    const std::vector< std::vector< double > > current_ADD_grad_DOF, previous_ADD_grad_DOF;
-
-    std::vector< double > PK2_answer   = { -26.78976487,  91.99831835, 135.04096376,
-                                           -63.68792655, 149.68226149, 186.67587146,
-                                           -42.54105342, 125.2317492 , 150.55767059 };
-
-    std::vector< double > SIGMA_answer = { -47.59920949,  20.84881327,  93.02392773,
-                                            20.84881327, 302.43209139, 311.0104045 ,
-                                            93.02392773, 311.0104045 , 312.60512922 };
-
-    std::vector< double > M_answer     = { -50.37283054, -23.25778149, -37.92963077, -19.16962188,
-                                           -32.97279228, -14.89104497, -33.4026237 , -15.47947779,
-                                           -40.31460994, -16.29637436, -36.63942799, -18.22777296,
-                                           -39.33546661, -86.69472439, -59.29150146, -15.76480164,
-                                           -55.42039768, -35.09720118, -28.94394503, -17.96726082,
-                                           -45.09734176, -16.46568416, -50.79898863, -39.19129183,
-                                           -47.46372724, -42.98201472, -45.57864883 };
-
-    std::vector< double > PK2_result, SIGMA_result, M_result;
-    std::vector< std::vector< double > > ADD_TERMS;
-    std::string output_message;
-
-    //Evaluate the model
-    int errorCode = material->evaluate_model( time, fparams,
-                                              current_grad_u, current_phi, current_grad_phi,
-                                              previous_grad_u, previous_phi, previous_grad_phi,
-                                              SDVS,
-                                              current_ADD_DOF, current_ADD_grad_DOF,
-                                              previous_ADD_DOF, previous_ADD_grad_DOF,
-                                              PK2_result, SIGMA_result, M_result,
-                                              ADD_TERMS,
-                                              output_message
-                                            );
-
-    if ( errorCode > 0 ){
-        std::cout << output_message << "\n";
-        results << "test_evaluate_model & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( PK2_result, PK2_answer ) ){
-        results << "test_evaluate_model (test 1) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) ){
-        results << "test_evaluate_model (test 2) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( M_result, M_answer ) ){
-        results << "test_evaluate_model (test 3) & False\n";
-        return 1;
-    }
-
-    //Check the Jacobian using the previously tested jacobian
-    std::vector< std::vector< double > > DPK2Dgrad_u_answer, DPK2Dphi_answer, DPK2Dgrad_phi_answer,
-                                         DSIGMADgrad_u_answer, DSIGMADphi_answer, DSIGMADgrad_phi_answer,
-                                         DMDgrad_u_answer, DMDphi_answer, DMDgrad_phi_answer;
-
-    std::vector< std::vector< std::vector< double > > > ADD_JACOBIANS;
-
-    errorCode = micromorphicLinearElasticity::evaluate_model( 
-                                time, fparams,
-                                current_grad_u, current_phi, current_grad_phi,
-                                previous_grad_u, previous_phi, previous_grad_phi,
-                                SDVS,
-                                current_ADD_DOF, current_ADD_grad_DOF,
-                                previous_ADD_DOF, previous_ADD_grad_DOF,
-                                PK2_result, SIGMA_result, M_result,
-                                DPK2Dgrad_u_answer, DPK2Dphi_answer, DPK2Dgrad_phi_answer,
-                                DSIGMADgrad_u_answer, DSIGMADphi_answer, DSIGMADgrad_phi_answer,
-                                DMDgrad_u_answer, DMDphi_answer, DMDgrad_phi_answer,
-                                ADD_TERMS, ADD_JACOBIANS,
-                                output_message
-                              );
-
-    if ( errorCode > 0 ){
-        std::cout << output_message << "\n";
-        results << "test_evaluate_model & False\n";
-        return 1;
-    }
-
-    PK2_result.clear();
-    SIGMA_result.clear();
-    M_result.clear();
-
-    std::vector< std::vector< double > > DPK2Dgrad_u_result, DPK2Dphi_result, DPK2Dgrad_phi_result,
-                                         DSIGMADgrad_u_result, DSIGMADphi_result, DSIGMADgrad_phi_result,
-                                         DMDgrad_u_result, DMDphi_result, DMDgrad_phi_result;
-
-    errorCode = material->evaluate_model( time, fparams,
-                                          current_grad_u, current_phi, current_grad_phi,
-                                          previous_grad_u, previous_phi, previous_grad_phi,
-                                          SDVS,
-                                          current_ADD_DOF, current_ADD_grad_DOF,
-                                          previous_ADD_DOF, previous_ADD_grad_DOF,
-                                          PK2_result, SIGMA_result, M_result,
-                                          DPK2Dgrad_u_result, DPK2Dphi_result, DPK2Dgrad_phi_result,
-                                          DSIGMADgrad_u_result, DSIGMADphi_result, DSIGMADgrad_phi_result,
-                                          DMDgrad_u_result, DMDphi_result, DMDgrad_phi_result,
-                                          ADD_TERMS, ADD_JACOBIANS,
-                                          output_message
-                                        );
-
-    if ( errorCode != 0 ){
-        std::cout << output_message << "\n";
-        results << "test_evaluate_model & False\n";
-    }
-
-    if ( !vectorTools::fuzzyEquals( PK2_result, PK2_answer ) ){
-        results << "test_evaluate_model (test 4) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) ){
-        results << "test_evaluate_model (test 5) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( M_result, M_answer ) ){
-        results << "test_evaluate_model (test 6) & False\n";
-        return 1;
-    }
-    
-    if ( !vectorTools::fuzzyEquals( DPK2Dgrad_u_result, DPK2Dgrad_u_answer ) ){
-        results << "test_evaluate_model (test 7) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DPK2Dphi_result, DPK2Dphi_answer ) ){
-        results << "test_evaluate_model (test 8) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DPK2Dgrad_phi_result, DPK2Dgrad_phi_answer ) ){
-        results << "test_evaluate_model (test 9) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DSIGMADgrad_u_result, DSIGMADgrad_u_answer ) ){
-        results << "test_evaluate_model (test 10) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DSIGMADphi_result, DSIGMADphi_answer ) ){
-        results << "test_evaluate_model (test 11) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DSIGMADgrad_phi_result, DSIGMADgrad_phi_answer ) ){
-        results << "test_evaluate_model (test 12) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DMDgrad_u_result, DMDgrad_u_answer ) ){
-        results << "test_evaluate_model (test 13) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DMDphi_result, DMDphi_answer ) ){
-        results << "test_evaluate_model (test 14) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DMDgrad_phi_result, DMDgrad_phi_answer ) ){
-        results << "test_evaluate_model (test 15) & False\n";
-        return 1;
-    }
-
-    //Test the computed numeric Jacobian values
-    errorCode = material->evaluate_model_numeric_gradients( time, fparams,
-                                                            current_grad_u, current_phi, current_grad_phi,
-                                                            previous_grad_u, previous_phi, previous_grad_phi,
-                                                            SDVS,
-                                                            current_ADD_DOF, current_ADD_grad_DOF,
-                                                            previous_ADD_DOF, previous_ADD_grad_DOF,
-                                                            PK2_result, SIGMA_result, M_result,
-                                                            DPK2Dgrad_u_result, DPK2Dphi_result, DPK2Dgrad_phi_result,
-                                                            DSIGMADgrad_u_result, DSIGMADphi_result, DSIGMADgrad_phi_result,
-                                                            DMDgrad_u_result, DMDphi_result, DMDgrad_phi_result,
-                                                            ADD_TERMS, ADD_JACOBIANS,
-                                                            output_message, 1e-6 );
-
-    if ( errorCode > 0 ){
-        results << "test_evaluate_model & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( PK2_result, PK2_answer ) ){
-        results << "test_evaluate_model (test 16) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( SIGMA_result, SIGMA_answer ) ){
-        results << "test_evaluate_model (test 17) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( M_result, M_answer ) ){
-        results << "test_evaluate_model (test 18) & False\n";
-        return 1;
-    }
-    
-    if ( !vectorTools::fuzzyEquals( DPK2Dgrad_u_result, DPK2Dgrad_u_answer ) ){
-        std::cout << "num:\n"; vectorTools::print( DPK2Dgrad_u_result );
-        std::cout << "ana:\n"; vectorTools::print( DPK2Dgrad_u_answer );
-        results << "test_evaluate_model (test 19) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DPK2Dphi_result, DPK2Dphi_answer ) ){
-        results << "test_evaluate_model (test 20) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DPK2Dgrad_phi_result, DPK2Dgrad_phi_answer ) ){
-        results << "test_evaluate_model (test 21) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DSIGMADgrad_u_result, DSIGMADgrad_u_answer ) ){
-        results << "test_evaluate_model (test 22) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DSIGMADphi_result, DSIGMADphi_answer ) ){
-        results << "test_evaluate_model (test 23) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DSIGMADgrad_phi_result, DSIGMADgrad_phi_answer ) ){
-        results << "test_evaluate_model (test 24) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DMDgrad_u_result, DMDgrad_u_answer ) ){
-        results << "test_evaluate_model (test 25) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DMDphi_result, DMDphi_answer ) ){
-        results << "test_evaluate_model (test 26) & False\n";
-        return 1;
-    }
-
-    if ( !vectorTools::fuzzyEquals( DMDgrad_phi_result, DMDgrad_phi_answer ) ){
-        results << "test_evaluate_model (test 27) & False\n";
-        return 1;
-    }
-
-    results << "test_materialLibraryInterface & True\n";
-    return 1;
-}
-
-int main(){
-    /*!
-    The main loop which runs the tests defined in the 
-    accompanying functions. Each function should output
-    the function name followed by & followed by True or False 
-    if the test passes or fails respectively.
-    */
-
-    //Open the results file
-    std::ofstream results;
-    results.open("results.tex");
-
-    //Run the tests
-    test_computeDeformationMeasures( results );
-    test_computeLinearElasticTerm1( results );
-    test_computeLinearElasticTerm2( results );
-    test_computeLinearElasticTerm3( results );
-    test_computeReferenceHigherOrderStress( results );
-    test_computeInvRCGPsi( results );
-    test_computeInvRCGGamma( results );
-    test_linearElasticityReference( results );
-    test_linearElasticityReferenceDerivedMeasures( results );
-    test_mapStressesToCurrent( results );
-    test_linearElasticity( results );
-
-    test_assembleFundamentalDeformationMeasures( results );
-    test_extractMaterialParameters( results );
-    test_cout_redirect( results );
-    test_cerr_redirect( results );
-
-    test_formIsotropicA( results );
-    test_formIsotropicB( results );
-    test_formIsotropicC( results );
-    test_formIsotropicD( results );
-
-    test_evaluate_model( results );
-    test_materialLibraryInterface( results );
-
-    //Close the results file
-    results.close();
-
-    return 0;
 }
