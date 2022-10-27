@@ -269,7 +269,7 @@ def test_construct_T_matrix():
     t10 = taus[  9 ]
     t11 = taus[ 10 ]
 
-    answerR = np.array( [ [ t1 + t2 + 3 * t3 + t7 + t10, 3 * t1 + t4 + 3 * t5 + t8 + t11, 3 * t2 + t5 + t6 + t8 + t9 ],
+    answerR = np.array( [ [ t1 + t2 + 3 * t3 + t7 + t10, 3 * t1 + t4 + t5 + t8 + t11, 3 * t2 + t5 + t6 + t8 + t9 ],
                           [ 3 * t1 + t2 + t3 + t8 + t11, t1 + 3 * t4 + t5 + t7 + t9, t2 + 3 * t5 + t6 + t8 + t10 ],
                           [ t1 + 3 * t2 + t3 + t8 + t9, t1 + t4 + 3 * t5 + t8 + t10, t2 + t5 + 3 * t6 + t7 + t11 ] ] )
     answerJ = finiteDifferenceTMatrix( taus )
