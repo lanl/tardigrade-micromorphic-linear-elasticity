@@ -3,15 +3,15 @@ A file which defines the constraint equations for the parameters required for fi
 """
 import numpy as np
 
-def evaluate_g1( l, s1, **kwargs ):
+def evaluate_g1( mu, s1, **kwargs ):
     """
     Evaluate the first constraint equation and also return the jacobians
 
-    :param float l: The value of the modulus lambda
+    :param float l: The value of the modulus mu
     :param float s1: The constraint value
     """
 
-    return l - s1**2, {'lambda':1., 's1':- 2 * s1 }
+    return mu - s1**2, {'mu':1., 's1':- 2 * s1 }
 
 def evaluate_g2( kappa, nu, sigma, s2, **kwargs ):
     """
@@ -264,7 +264,7 @@ def construct_T_matrix( taus ):
                                        [ 0, 3, 0 ],
                                        [ 0, 1, 0 ] ] ).astype( float )
 
-    jacobian[ :, :,  4 ] = np.array( [ [ 0, 3, 1 ],
+    jacobian[ :, :,  4 ] = np.array( [ [ 0, 1, 1 ],
                                        [ 0, 1, 3 ],
                                        [ 0, 3, 1 ] ] ).astype( float )
 

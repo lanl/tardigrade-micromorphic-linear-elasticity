@@ -1,4 +1,4 @@
-from parameter_constraint_equations import *
+from linear_elastic_parameter_constraint_equations import *
 import numpy as np
 from numpy.random import rand
 
@@ -70,13 +70,13 @@ def finiteDifferenceTMatrix( vals, eps = 1e-6 ):
 
 def test_evaluate_g1():
 
-    l = rand()
+    mu = rand()
     s = rand()
 
-    answerR = l - s**2
-    answerJ = finiteDifferenceConstraint( evaluate_g1, [ l, s ], [ 'lambda', 's1' ] )
+    answerR = mu - s**2
+    answerJ = finiteDifferenceConstraint( evaluate_g1, [ mu, s ], [ 'mu', 's1' ] )
 
-    resultR, resultJ = evaluate_g1( l, s )
+    resultR, resultJ = evaluate_g1( mu, s )
 
     assert( np.isclose( answerR, resultR ) )
 
