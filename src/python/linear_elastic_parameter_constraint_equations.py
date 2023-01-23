@@ -3,15 +3,15 @@ A file which defines the constraint equations for the parameters required for fi
 """
 import numpy as np
 
-def evaluate_g1( l, s1, **kwargs ):
+def evaluate_g1( mu, s1, **kwargs ):
     """
     Evaluate the first constraint equation and also return the jacobians
 
-    :param float l: The value of the modulus lambda
+    :param float l: The value of the modulus mu
     :param float s1: The constraint value
     """
 
-    return l - s1**2, {'lambda':1., 's1':- 2 * s1 }
+    return mu - s1**2, {'mu':1., 's1':- 2 * s1 }
 
 def evaluate_g2( kappa, nu, sigma, s2, **kwargs ):
     """
@@ -242,7 +242,7 @@ def construct_T_matrix( taus ):
 
     t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11 = taus
 
-    T = np.array ( [ [ t1 + t2 + 3 * t3 + t7 + t10, 3 * t1 + t4 + 3 * t5 + t8 + t11, 3 * t2 + t5 + t6 + t8 + t9 ],\
+    T = np.array ( [ [ t1 + t2 + 3 * t3 + t7 + t10, 3 * t1 + t4 + t5 + t8 + t11, 3 * t2 + t5 + t6 + t8 + t9 ],\
                      [ 3 * t1 + t2 + t3 + t8 + t11, t1 + 3 * t4 + t5 + t7 + t9, t2 + 3 * t5 + t6 + t8 + t10 ],\
                      [ t1 + 3 * t2 + t3 + t8 + t9, t1 + t4 + 3 * t5 + t8 + t10, t2 + t5 + 3 * t6 + t7 + t11 ] ] );
 
@@ -264,7 +264,7 @@ def construct_T_matrix( taus ):
                                        [ 0, 3, 0 ],
                                        [ 0, 1, 0 ] ] ).astype( float )
 
-    jacobian[ :, :,  4 ] = np.array( [ [ 0, 3, 1 ],
+    jacobian[ :, :,  4 ] = np.array( [ [ 0, 1, 1 ],
                                        [ 0, 1, 3 ],
                                        [ 0, 3, 1 ] ] ).astype( float )
 

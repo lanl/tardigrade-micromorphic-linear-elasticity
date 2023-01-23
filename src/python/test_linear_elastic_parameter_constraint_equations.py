@@ -1,4 +1,4 @@
-from parameter_constraint_equations import *
+from linear_elastic_parameter_constraint_equations import *
 import numpy as np
 from numpy.random import rand
 
@@ -70,13 +70,13 @@ def finiteDifferenceTMatrix( vals, eps = 1e-6 ):
 
 def test_evaluate_g1():
 
-    l = rand()
+    mu = rand()
     s = rand()
 
-    answerR = l - s**2
-    answerJ = finiteDifferenceConstraint( evaluate_g1, [ l, s ], [ 'lambda', 's1' ] )
+    answerR = mu - s**2
+    answerJ = finiteDifferenceConstraint( evaluate_g1, [ mu, s ], [ 'mu', 's1' ] )
 
-    resultR, resultJ = evaluate_g1( l, s )
+    resultR, resultJ = evaluate_g1( mu, s )
 
     assert( np.isclose( answerR, resultR ) )
 
@@ -269,7 +269,7 @@ def test_construct_T_matrix():
     t10 = taus[  9 ]
     t11 = taus[ 10 ]
 
-    answerR = np.array( [ [ t1 + t2 + 3 * t3 + t7 + t10, 3 * t1 + t4 + 3 * t5 + t8 + t11, 3 * t2 + t5 + t6 + t8 + t9 ],
+    answerR = np.array( [ [ t1 + t2 + 3 * t3 + t7 + t10, 3 * t1 + t4 + t5 + t8 + t11, 3 * t2 + t5 + t6 + t8 + t9 ],
                           [ 3 * t1 + t2 + t3 + t8 + t11, t1 + 3 * t4 + t5 + t7 + t9, t2 + 3 * t5 + t6 + t8 + t10 ],
                           [ t1 + 3 * t2 + t3 + t8 + t9, t1 + t4 + 3 * t5 + t8 + t10, t2 + t5 + 3 * t6 + t7 + t11 ] ] )
     answerJ = finiteDifferenceTMatrix( taus )
