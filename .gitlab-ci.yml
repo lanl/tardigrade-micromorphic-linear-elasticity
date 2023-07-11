@@ -64,13 +64,17 @@ environment:
     - cp ${PWD}/modulefiles/* ${aea_modulefiles}
   tags:
     # FIXME: troubleshoot sstbigbird/RHEL8 python interpretter mismatch
-    # https://re-git.lanl.gov/aea/material-models/micromorphic_linear_elasticity/-/issues/9
+    # https://re-git.lanl.gov/aea/material-models/micromorphic_tools/-/issues/9
     - sstelmo-shell-aea
 
 microbump:
   stage: version
   variables:
     GIT_STRATEGY: clone
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main"
   script:
     # Build VERSION file from GetVersionFromGit.cmake without a full CMake configuration
     - ${cmake_program} -D PROJECT_NAME=cpp_stub -D VERSION_UPDATE_FROM_GIT=True -P src/cmake/GetVersionFromGitTag.cmake
@@ -86,9 +90,9 @@ microbump:
     - git tag -a ${developer_version} -m "developer release ${developer_version}" ${last_merge_hash} || true
     - git push oauth2-origin --tags
   tags:
+    # FIXME: troubleshoot sstbigbird/RHEL8 python interpretter mismatch
+    # https://re-git.lanl.gov/aea/material-models/micromorphic_tools/-/issues/9
     - sstelmo-shell-aea
-  only:
-    - main
 
 test_build:
   stage: test
@@ -96,6 +100,11 @@ test_build:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
     GIT_STRATEGY: clone
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "dev"
   script:
     - workdir=${PWD}
     - mkdir build
@@ -109,6 +118,8 @@ test_build:
     paths:
       - build/results.txt
   tags:
+    # FIXME: troubleshoot sstbigbird/RHEL8 python interpretter mismatch
+    # https://re-git.lanl.gov/aea/material-models/micromorphic_tools/-/issues/9
     - sstelmo-shell-aea
 
 # It MUST be called pages
@@ -116,7 +127,13 @@ pages:
   stage: deploy
   variables:
     GIT_STRATEGY: clone
+  dependencies: []
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main"
   script:
+    - workdir=${PWD}
     - rm -rf public && mkdir -p public
     - cp docs/html/index.html public
     # Every documentation version must be re-built for *every* gitlab-pages job execution
@@ -138,7 +155,6 @@ pages:
       # It MUST be called public
       - public
   tags:
+    # FIXME: troubleshoot sstbigbird/RHEL8 python interpretter mismatch
+    # https://re-git.lanl.gov/aea/material-models/micromorphic_tools/-/issues/9
     - sstelmo-shell-aea
-  only:
-    - main
-    - dev
