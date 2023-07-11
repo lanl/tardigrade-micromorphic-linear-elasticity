@@ -75,12 +75,17 @@ test_build:
   variables:
     GIT_STRATEGY: clone
   script:
-    - ./BUILD.sh
-    - ./TEST.sh
+    - workdir=${PWD}
+    - mkdir build
+    - cd build
+    - ${cmake_program} .. -DCMAKE_BUILD_TYPE=Release
+    - ${cmake_program} --build . --verbose
+    - ctest --verbose --output-log results.txt
+    - cd ${workdir}
   artifacts:
     when: always
     paths:
-      - build/results.tex
+      - build/results.txt
   tags:
     - sstelmo-shell-aea
 

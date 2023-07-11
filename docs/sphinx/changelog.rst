@@ -6,7 +6,15 @@ Changelog
 #########
 
 ******************
-1.1.1 (unreleased)
+1.2.1 (unreleased)
+******************
+
+Internal Changes
+================
+- Replace shell scripts with inline Gitlab CI configuration (:issue:`2`, :merge:`12`). By `Kyle Brindley`_.
+
+******************
+1.1.1 (2022-11-03)
 ******************
 
 Internal Changes
