@@ -76,8 +76,10 @@ test_build:
     GIT_STRATEGY: clone
   script:
     - workdir=${PWD}
-    - ./BUILD.sh
+    - mkdir build
     - cd build
+    - ${cmake_program} .. -DCMAKE_BUILD_TYPE=Release
+    - ${cmake_program} --build . --verbose
     - ctest --verbose --output-log results.txt
     - cd ${workdir}
   artifacts:
