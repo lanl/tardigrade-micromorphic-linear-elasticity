@@ -83,14 +83,13 @@ All production releases require a release branch.
 Releases correspond to a variety of bug fixes and features that characterize
 the release, as documented in :ref:`changelog`.
 
-The following steps will trigger a micro bump. Major and minor version bumps
-require a manual Git tag update for the otherwise automated ``GetVersionFromGitTag.cmake``
-SCM version script.
+The following steps will trigger a micro bump. Major and minor version bumps require a manual Git tag update for the
+otherwise automated `setuptools_scm`_ version determination from the project Git tags.
 
 Steps needed for a release include:
 
 1. Create a release branch.
-2. Modify ``docs/changelog.rst`` to move version number for release PR commit and
+2. Modify ``docs/sphinx/changelog.rst`` to move version number for release PR commit and
    add description as relevant.
 3. Commit changes and submit a pull request to the ``dev`` branch at the `upstream repository`_.
 4. **Major and Minor bumps ONLY**: Manually add the new developer version tag to the "Merge" commit on the ``dev``
