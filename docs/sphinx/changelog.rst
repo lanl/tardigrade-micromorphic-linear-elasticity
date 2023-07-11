@@ -12,6 +12,7 @@ Changelog
 Internal Changes
 ================
 - Replace shell scripts with inline Gitlab CI configuration (:issue:`2`, :merge:`12`). By `Kyle Brindley`_.
+- Create project specific CI environment (:issue:`3`, :merge:`13`). By `Kyle Brindley`_.
 
 ******************
 1.1.1 (2022-11-03)
