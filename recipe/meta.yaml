@@ -68,7 +68,7 @@ test:
   source_files:
     - CMakeLists.txt
     - src/cpp/tests/CMakeLists.txt
-    - src/cpp/tests/test_micromorphic_tools.cpp
+    - src/cpp/tests/test_micromorphic_linear_elasticity.cpp
   commands:
     - mkdir build-tests
     - cd build-tests
