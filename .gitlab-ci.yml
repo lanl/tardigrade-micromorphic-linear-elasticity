@@ -77,7 +77,7 @@ microbump:
     - if: $CI_COMMIT_BRANCH == "main"
   script:
     # Build VERSION file from GetVersionFromGit.cmake without a full CMake configuration
-    - ${cmake_program} -D PROJECT_NAME=cpp_stub -D VERSION_UPDATE_FROM_GIT=True -P src/cmake/GetVersionFromGitTag.cmake
+    - cmake -D PROJECT_NAME=cpp_stub -D VERSION_UPDATE_FROM_GIT=True -P src/cmake/GetVersionFromGitTag.cmake
     # GetVersionFromGit.cmake bumps micro/patch version. Retrieve next release from VERSION
     - production_version=$(cut -f 1 -d '*' VERSION)
     - developer_version=${production_version}+dev
@@ -109,8 +109,8 @@ test_build:
     - workdir=${PWD}
     - mkdir build
     - cd build
-    - ${cmake_program} .. -DCMAKE_BUILD_TYPE=Release
-    - ${cmake_program} --build . --verbose
+    - cmake .. -DCMAKE_BUILD_TYPE=Release
+    - cmake --build . --verbose
     - ctest --verbose --output-log results.txt
     - cd ${workdir}
   artifacts:
