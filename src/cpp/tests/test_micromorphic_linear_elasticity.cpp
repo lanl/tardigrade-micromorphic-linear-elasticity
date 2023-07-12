@@ -3216,7 +3216,7 @@ BOOST_AUTO_TEST_CASE( testEvaluateModel ){
 
     for ( unsigned int i = 0; i < 27; i++ ){
         variableMatrix delta( 9, variableVector( 3, 0 ) );
-        delta[ i / 3 ][ i % 3 ] = eps * fabs( current_grad_u[ i / 3 ][ i % 3 ] ) + eps;
+        delta[ i / 3 ][ i % 3 ] = eps * fabs( current_grad_phi[ i / 3 ][ i % 3 ] ) + eps;
 
         double current_grad_phi_P[ 9 ][ 3 ] =
         {
