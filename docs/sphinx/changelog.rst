@@ -6,6 +6,14 @@ Changelog
 #########
 
 ******************
+1.3.1 (2023-07-25)
+******************
+
+Breaking changes
+================
+- Change project, package, and namespace to use the 'tardigrade' prefix (:issue:`7`, :merge:`18`). By `Kyle Brindley`_.
+
+******************
 1.2.1 (2023-07-11)
 ******************
 
@@ -15,6 +23,11 @@ Internal Changes
 - Create project specific CI environment (:issue:`3`, :merge:`13`). By `Kyle Brindley`_.
 - Use setuptools_scm for Git tag versioning (:issue:`4`, :merge:`14`). By `Kyle Brindley`_.
 - Conda package and deployment (:issue:`5`, :merge:`15`). By `Kyle Brindley`_.
+
+Bug Fix
+=======
+- Identified and corrected access out of bounds error in test of gradient of the reference stresses w.r.t.
+  the gradient of the micro deformation (:merge:`17`). By `Nathan Miller`_.
 
 ******************
 1.1.1 (2022-11-03)
