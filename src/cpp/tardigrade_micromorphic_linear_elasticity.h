@@ -1,5 +1,5 @@
 /*
- * micromorphic_linear_elasticity.h
+ * tardigrade_micromorphic_linear_elasticity.h
  *
  * An implimentation of linear elasticity in the micromorphic context.
  *
@@ -8,31 +8,31 @@
  *           + \frac{1}{2} \Gamma_{IJK} C_{IJKLMN} \Gamma_{LMN} + E_{IJ} D_{IJKL} \mathcal{E}_{KL}
  */
 
-#ifndef MICROMORPHIC_LINEAR_ELASTICITY_H
-#define MICROMORPHIC_LINEAR_ELASTICITY_H
+#ifndef TARDIGRADE_MICROMORPHIC_LINEAR_ELASTICITY_H
+#define TARDIGRADE_MICROMORPHIC_LINEAR_ELASTICITY_H
 
-#include<error_tools.h>
+#include<tardigrade_error_tools.h>
 #define USE_EIGEN
-#include<vector_tools.h>
-#include<constitutive_tools.h>
-#include<micromorphic_tools.h>
+#include<tardigrade_vector_tools.h>
+#include<tardigrade_constitutive_tools.h>
+#include<tardigrade_micromorphic_tools.h>
 //#include<micromorphic_material_library.h>
 
-namespace micromorphicLinearElasticity{
+namespace tardigradeMicromorphicLinearElasticity{
 
-    typedef micromorphicTools::variableType variableType;
-    typedef micromorphicTools::variableVector variableVector;
-    typedef micromorphicTools::variableMatrix variableMatrix;
+    typedef tardigradeMicromorphicTools::variableType variableType;
+    typedef tardigradeMicromorphicTools::variableVector variableVector;
+    typedef tardigradeMicromorphicTools::variableMatrix variableMatrix;
 
-    typedef micromorphicTools::parameterType parameterType;
-    typedef micromorphicTools::parameterVector parameterVector;
-    typedef micromorphicTools::parameterMatrix parameterMatrix;
+    typedef tardigradeMicromorphicTools::parameterType parameterType;
+    typedef tardigradeMicromorphicTools::parameterVector parameterVector;
+    typedef tardigradeMicromorphicTools::parameterMatrix parameterMatrix;
 
-    typedef micromorphicTools::constantType constantType;
-    typedef micromorphicTools::constantVector constantVector;
-    typedef micromorphicTools::constantMatrix constantMatrix;
+    typedef tardigradeMicromorphicTools::constantType constantType;
+    typedef tardigradeMicromorphicTools::constantVector constantVector;
+    typedef tardigradeMicromorphicTools::constantMatrix constantMatrix;
 
-    typedef errorTools::Node errorNode;
+    typedef tardigradeErrorTools::Node errorNode;
     typedef errorNode* errorOut;
 
     struct cout_redirect{

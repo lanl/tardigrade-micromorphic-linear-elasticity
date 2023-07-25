@@ -6,6 +6,14 @@ Changelog
 #########
 
 ******************
+1.3.1 (2023-07-25)
+******************
+
+Breaking changes
+================
+- Change project, package, and namespace to use the 'tardigrade' prefix (:issue:`7`, :merge:`18`). By `Kyle Brindley`_.
+
+******************
 1.2.1 (2023-07-11)
 ******************
 

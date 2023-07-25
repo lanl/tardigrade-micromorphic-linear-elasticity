@@ -1,5 +1,5 @@
 /*
- * micromorphic_linear_elasticity.cpp
+ * tardigrade_micromorphic_linear_elasticity.cpp
  *
  * An implimentation of linear elasticity in the micromorphic context.
  *
@@ -8,9 +8,9 @@
  *           + \frac{1}{2} \Gamma_{IJK} C_{IJKLMN} \Gamma_{LMN} + E_{IJ} D_{IJKL} \mathcal{E}_{KL}
  */
 
-#include<micromorphic_linear_elasticity.h>
+#include<tardigrade_micromorphic_linear_elasticity.h>
 
-namespace micromorphicLinearElasticity{
+namespace tardigradeMicromorphicLinearElasticity{
 
     errorOut linearElasticityReference( const variableVector &deformationGradient, const variableVector &microDeformation,
                                         const variableVector &gradientMicroDeformation,
@@ -90,9 +90,9 @@ namespace micromorphicLinearElasticity{
         unsigned int dim = 3;
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
-        variableVector invRCG = vectorTools::inverse( rightCauchyGreenDeformation, dim, dim );
+        variableVector invRCG = tardigradeVectorTools::inverse( rightCauchyGreenDeformation, dim, dim );
 
         //Compute the strain measures
         variableVector greenLagrangeStrain = 0.5 * ( rightCauchyGreenDeformation - eye );
@@ -165,7 +165,7 @@ namespace micromorphicLinearElasticity{
         PK2Stress            = term1 + term2 + term3;
 
         variableVector symmTerm2Term3;
-        error = constitutiveTools::computeSymmetricPart( term2 + term3, symmTerm2Term3 );
+        error = tardigradeConstitutiveTools::computeSymmetricPart( term2 + term3, symmTerm2Term3 );
         referenceMicroStress = term1 + 2 * symmTerm2Term3;
 
         return NULL;
@@ -212,7 +212,7 @@ namespace micromorphicLinearElasticity{
         unsigned int dim = 3;
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         //Compute the required deformation measures
         variableVector RCG, Psi, Gamma;
@@ -244,24 +244,24 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        dPK2StressdF = vectorTools::dot( dPK2StressdRCG, dRCGdF )
-                     + vectorTools::dot( dPK2StressdPsi, dPsidF )
-                     + vectorTools::dot( dPK2StressdGamma, dGammadF );
+        dPK2StressdF = tardigradeVectorTools::dot( dPK2StressdRCG, dRCGdF )
+                     + tardigradeVectorTools::dot( dPK2StressdPsi, dPsidF )
+                     + tardigradeVectorTools::dot( dPK2StressdGamma, dGammadF );
 
-        dPK2StressdChi = vectorTools::dot( dPK2StressdPsi, dPsidChi );
+        dPK2StressdChi = tardigradeVectorTools::dot( dPK2StressdPsi, dPsidChi );
 
-        dPK2StressdGradChi = vectorTools::dot( dPK2StressdGamma, dGammadGradChi );
+        dPK2StressdGradChi = tardigradeVectorTools::dot( dPK2StressdGamma, dGammadGradChi );
 
-        dReferenceMicroStressdF = vectorTools::dot( dReferenceMicroStressdRCG, dRCGdF )
-                                + vectorTools::dot( dReferenceMicroStressdPsi, dPsidF )
-                                + vectorTools::dot( dReferenceMicroStressdGamma, dGammadF );
+        dReferenceMicroStressdF = tardigradeVectorTools::dot( dReferenceMicroStressdRCG, dRCGdF )
+                                + tardigradeVectorTools::dot( dReferenceMicroStressdPsi, dPsidF )
+                                + tardigradeVectorTools::dot( dReferenceMicroStressdGamma, dGammadF );
 
-        dReferenceMicroStressdChi = vectorTools::dot( dReferenceMicroStressdPsi, dPsidChi );
+        dReferenceMicroStressdChi = tardigradeVectorTools::dot( dReferenceMicroStressdPsi, dPsidChi );
 
-        dReferenceMicroStressdGradChi = vectorTools::dot( dReferenceMicroStressdGamma, dGammadGradChi );
+        dReferenceMicroStressdGradChi = tardigradeVectorTools::dot( dReferenceMicroStressdGamma, dGammadGradChi );
 
-        dMdF = vectorTools::dot( dMdGamma, dGammadF );
-        dMdGradChi = vectorTools::dot( dMdGamma, dGammadGradChi );
+        dMdF = tardigradeVectorTools::dot( dMdGamma, dGammadF );
+        dMdGradChi = tardigradeVectorTools::dot( dMdGamma, dGammadGradChi );
 
         return NULL;
     }
@@ -314,9 +314,9 @@ namespace micromorphicLinearElasticity{
         unsigned int dim = 3;
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
-        variableVector invRCG = vectorTools::inverse( rightCauchyGreenDeformation, dim, dim );
+        variableVector invRCG = tardigradeVectorTools::inverse( rightCauchyGreenDeformation, dim, dim );
 
         //Compute the strain measures
         variableVector greenLagrangeStrain = 0.5 * ( rightCauchyGreenDeformation - eye );
@@ -375,9 +375,9 @@ namespace micromorphicLinearElasticity{
         }
 
         dTerm2dRCG *= 0.5;
-        dTerm2dRCG += vectorTools::dot( dTerm2dInvRCGPsi, dInvRCGPsidRCG );
+        dTerm2dRCG += tardigradeVectorTools::dot( dTerm2dInvRCGPsi, dInvRCGPsidRCG );
 
-        dTerm2dPsi += vectorTools::dot( dTerm2dInvRCGPsi, dInvRCGPsidPsi );
+        dTerm2dPsi += tardigradeVectorTools::dot( dTerm2dInvRCGPsi, dInvRCGPsidPsi );
 
         //Compute the third common term for the PK2 and symmetric micro-stress
         variableVector invRCGGamma;
@@ -403,9 +403,9 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        variableMatrix dTerm3dRCG = vectorTools::dot( dTerm3dInvRCGGamma, dInvRCGGammadRCG );
-        variableMatrix dTerm3dGamma = vectorTools::dot( dTerm3dInvRCGGamma, dInvRCGGammadGamma )
-                                    + vectorTools::dot( dTerm3dM, dMdGamma );
+        variableMatrix dTerm3dRCG = tardigradeVectorTools::dot( dTerm3dInvRCGGamma, dInvRCGGammadRCG );
+        variableMatrix dTerm3dGamma = tardigradeVectorTools::dot( dTerm3dInvRCGGamma, dInvRCGGammadGamma )
+                                    + tardigradeVectorTools::dot( dTerm3dM, dMdGamma );
 
         //Construct the PK2 and reference symmetric stresses
         PK2Stress            = term1 + term2 + term3;
@@ -416,14 +416,14 @@ namespace micromorphicLinearElasticity{
 
         variableVector symmTerm2Term3;
         variableMatrix dSymmTerm2Term3dTerm2Term3;
-        error = constitutiveTools::computeSymmetricPart( term2 + term3, symmTerm2Term3, dSymmTerm2Term3dTerm2Term3 );
+        error = tardigradeConstitutiveTools::computeSymmetricPart( term2 + term3, symmTerm2Term3, dSymmTerm2Term3dTerm2Term3 );
         referenceMicroStress = term1 + 2 * symmTerm2Term3;
 
-        dReferenceMicroStressdRCG = dTerm1dRCG + 2 * ( vectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm2dRCG )
-                                                     + vectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm3dRCG ) );
+        dReferenceMicroStressdRCG = dTerm1dRCG + 2 * ( tardigradeVectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm2dRCG )
+                                                     + tardigradeVectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm3dRCG ) );
 
-        dReferenceMicroStressdPsi = dTerm1dPsi + 2 * vectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm2dPsi );
-        dReferenceMicroStressdGamma = 2 * vectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm3dGamma );
+        dReferenceMicroStressdPsi = dTerm1dPsi + 2 * tardigradeVectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm2dPsi );
+        dReferenceMicroStressdGamma = 2 * tardigradeVectorTools::dot( dSymmTerm2Term3dTerm2Term3, dTerm3dGamma );
 
         return NULL;
     }
@@ -445,7 +445,7 @@ namespace micromorphicLinearElasticity{
          * :param variableVector &Gamma: The gradient micro-deformation measure
          */
 
-        errorOut error = constitutiveTools::computeRightCauchyGreen( deformationGradient, rightCauchyGreen );
+        errorOut error = tardigradeConstitutiveTools::computeRightCauchyGreen( deformationGradient, rightCauchyGreen );
 
         if ( error ){
             errorOut result = new errorNode( "computeDeformationMeasures",
@@ -454,7 +454,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::computePsi( deformationGradient, microDeformation, Psi );
+        error = tardigradeMicromorphicTools::computePsi( deformationGradient, microDeformation, Psi );
         
         if ( error ){
             errorOut result = new errorNode( "computeDeformationMeasures",
@@ -463,7 +463,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::computeGamma( deformationGradient, gradientMicroDeformation, Gamma );
+        error = tardigradeMicromorphicTools::computeGamma( deformationGradient, gradientMicroDeformation, Gamma );
 
         if ( error ){
             errorOut result = new errorNode( "computeDeformationMeasures",
@@ -501,7 +501,7 @@ namespace micromorphicLinearElasticity{
          * :param variableMatrix &dGammadGradChi: The gradient of Gamma w.r.t. the spatial gradient of Chi
          */
 
-        errorOut error = constitutiveTools::computeRightCauchyGreen( deformationGradient, rightCauchyGreen, dCdF );
+        errorOut error = tardigradeConstitutiveTools::computeRightCauchyGreen( deformationGradient, rightCauchyGreen, dCdF );
 
         if ( error ){
             errorOut result = new errorNode( "computeDeformationMeasures (jacobian)",
@@ -510,7 +510,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::computePsi( deformationGradient, microDeformation, Psi, dPsidF, dPsidChi );
+        error = tardigradeMicromorphicTools::computePsi( deformationGradient, microDeformation, Psi, dPsidF, dPsidChi );
         
         if ( error ){
             errorOut result = new errorNode( "computeDeformationMeasures (jacobian)",
@@ -519,7 +519,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::computeGamma( deformationGradient, gradientMicroDeformation, Gamma, dGammadF, dGammadGradChi );
+        error = tardigradeMicromorphicTools::computeGamma( deformationGradient, gradientMicroDeformation, Gamma, dGammadF, dGammadGradChi );
 
         if ( error ){
             errorOut result = new errorNode( "computeDeformationMeasures (jacobian)",
@@ -733,7 +733,7 @@ namespace micromorphicLinearElasticity{
 
         //Compute the Jacobians
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
         dTerm2dGreenLagrangeStrain = variableMatrix( term2.size(), variableVector( greenLagrangeStrain.size(), 0 ) );
         dTerm2dMicroStrain         = variableMatrix( term2.size(), variableVector( microStrain.size(), 0 ) );
         dTerm2dInvCPsi             = variableMatrix( term2.size(), variableVector( invCPsi.size(), 0 ) );
@@ -917,7 +917,7 @@ namespace micromorphicLinearElasticity{
         }
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         dTerm3dInvCGamma = variableMatrix( dim * dim, variableVector( dim * dim * dim, 0 ) );
         dTerm3dReferenceHigherOrderStress = variableMatrix( dim * dim, variableVector( dim * dim * dim, 0 ) );
@@ -957,7 +957,7 @@ namespace micromorphicLinearElasticity{
             return new errorNode( "computeInvRCGGamma", "Psi has an improper dimension" );
         }
 
-        invRCGPsi = vectorTools::matrixMultiply( invRCG, Psi, dim, dim, dim, dim );
+        invRCGPsi = tardigradeVectorTools::matrixMultiply( invRCG, Psi, dim, dim, dim, dim );
 
         return NULL;
     }
@@ -992,7 +992,7 @@ namespace micromorphicLinearElasticity{
 
         //Construct the jacobians
         variableVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         dInvRCGPsidRCG = variableMatrix( invRCGPsi.size(), variableVector( invRCG.size(), 0 ) );
         dInvRCGPsidPsi = variableMatrix( invRCGPsi.size(), variableVector( Psi.size(), 0 ) );
@@ -1072,7 +1072,7 @@ namespace micromorphicLinearElasticity{
 
         //Assemble jacobians of invCGamma w.r.t. C and Gamma
         variableVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         dInvRCGGammadRCG = variableMatrix( dim * dim * dim, variableVector( dim * dim, 0 ) );
         dInvRCGGammadGamma = variableMatrix( dim * dim * dim, variableVector( dim * dim * dim, 0 ) );
@@ -1120,7 +1120,7 @@ namespace micromorphicLinearElasticity{
          */
 
         //Map the PK2 stress to the Cauchy stress
-        errorOut error = micromorphicTools::pushForwardPK2Stress( PK2Stress, deformationGradient, cauchyStress );
+        errorOut error = tardigradeMicromorphicTools::pushForwardPK2Stress( PK2Stress, deformationGradient, cauchyStress );
 
         if ( error ){
             errorOut result = new errorNode( "mapStressMeasuresToCurrent",
@@ -1130,7 +1130,7 @@ namespace micromorphicLinearElasticity{
         }
 
         //Map the symmetric micro stress to the current configuration
-        error = micromorphicTools::pushForwardReferenceMicroStress( referenceMicroStress, deformationGradient, microStress );
+        error = tardigradeMicromorphicTools::pushForwardReferenceMicroStress( referenceMicroStress, deformationGradient, microStress );
 
         if ( error ){
             errorOut result = new errorNode( "mapStressMeasuresToCurrent",
@@ -1140,7 +1140,7 @@ namespace micromorphicLinearElasticity{
         }
 
         //Map the higher order stress to the current configuration
-        error = micromorphicTools::pushForwardHigherOrderStress( referenceHigherOrderStress, deformationGradient,
+        error = tardigradeMicromorphicTools::pushForwardHigherOrderStress( referenceHigherOrderStress, deformationGradient,
                                                                  microDeformation, higherOrderStress );
 
         if ( error ){
@@ -1196,7 +1196,7 @@ namespace micromorphicLinearElasticity{
          */
 
         //Map the PK2 stress to the Cauchy stress
-        errorOut error = micromorphicTools::pushForwardPK2Stress( PK2Stress, deformationGradient, cauchyStress,
+        errorOut error = tardigradeMicromorphicTools::pushForwardPK2Stress( PK2Stress, deformationGradient, cauchyStress,
                                                                   dCauchyStressdPK2Stress, dCauchyStressdF );
 
         if ( error ){
@@ -1207,7 +1207,7 @@ namespace micromorphicLinearElasticity{
         }
 
         //Map the symmetric micro stress to the current configuration
-        error = micromorphicTools::pushForwardReferenceMicroStress( referenceMicroStress, deformationGradient, microStress,
+        error = tardigradeMicromorphicTools::pushForwardReferenceMicroStress( referenceMicroStress, deformationGradient, microStress,
                                                                     dMicroStressdReferenceMicroStress, dMicroStressdF );
 
         if ( error ){
@@ -1218,7 +1218,7 @@ namespace micromorphicLinearElasticity{
         }
 
         //Map the higher order stress to the current configuration
-        error = micromorphicTools::pushForwardHigherOrderStress( referenceHigherOrderStress, deformationGradient,
+        error = tardigradeMicromorphicTools::pushForwardHigherOrderStress( referenceHigherOrderStress, deformationGradient,
                                                                  microDeformation, higherOrderStress,
                                                                  dHigherOrderStressdReferenceHigherOrderStress,
                                                                  dHigherOrderStressdF,
@@ -1360,19 +1360,19 @@ namespace micromorphicLinearElasticity{
         }
 
         //Assemble the jacobians of the Cauchy stress
-        dCauchyStressdF += vectorTools::dot( dCauchyStressdPK2Stress, dPK2StressdF );
-        dCauchyStressdChi = vectorTools::dot( dCauchyStressdPK2Stress, dPK2StressdChi );
-        dCauchyStressdGradChi = vectorTools::dot( dCauchyStressdPK2Stress, dPK2StressdGradChi );
+        dCauchyStressdF += tardigradeVectorTools::dot( dCauchyStressdPK2Stress, dPK2StressdF );
+        dCauchyStressdChi = tardigradeVectorTools::dot( dCauchyStressdPK2Stress, dPK2StressdChi );
+        dCauchyStressdGradChi = tardigradeVectorTools::dot( dCauchyStressdPK2Stress, dPK2StressdGradChi );
 
         //Assemble the jacobians of the symmetric micro-stress
-        dMicroStressdF += vectorTools::dot( dMicroStressdReferenceMicroStress, dReferenceMicroStressdF );
-        dMicroStressdChi = vectorTools::dot( dMicroStressdReferenceMicroStress, dReferenceMicroStressdChi );
-        dMicroStressdGradChi = vectorTools::dot( dMicroStressdReferenceMicroStress, dReferenceMicroStressdGradChi );
+        dMicroStressdF += tardigradeVectorTools::dot( dMicroStressdReferenceMicroStress, dReferenceMicroStressdF );
+        dMicroStressdChi = tardigradeVectorTools::dot( dMicroStressdReferenceMicroStress, dReferenceMicroStressdChi );
+        dMicroStressdGradChi = tardigradeVectorTools::dot( dMicroStressdReferenceMicroStress, dReferenceMicroStressdGradChi );
 
         //Assemble the jacobians of the higher-order stress
-        dHigherOrderStressdF += vectorTools::dot( dHigherOrderStressdReferenceHigherOrderStress,
+        dHigherOrderStressdF += tardigradeVectorTools::dot( dHigherOrderStressdReferenceHigherOrderStress,
                                                   dReferenceHigherOrderStressdF );
-        dHigherOrderStressdGradChi = vectorTools::dot( dHigherOrderStressdReferenceHigherOrderStress,
+        dHigherOrderStressdGradChi = tardigradeVectorTools::dot( dHigherOrderStressdReferenceHigherOrderStress,
                                                       dReferenceHigherOrderStressdGradChi );
 
         return NULL;
@@ -1392,7 +1392,7 @@ namespace micromorphicLinearElasticity{
         unsigned int dim = 3;
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         A = parameterVector( dim * dim * dim * dim, 0 );
 
@@ -1430,7 +1430,7 @@ namespace micromorphicLinearElasticity{
         unsigned int dim = 3;
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         B = parameterVector( dim * dim * dim * dim, 0 );
 
@@ -1478,7 +1478,7 @@ namespace micromorphicLinearElasticity{
         }
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         C = parameterVector( dim * dim * dim * dim * dim * dim, 0 );
 
@@ -1528,7 +1528,7 @@ namespace micromorphicLinearElasticity{
         unsigned int dim = 3;
 
         constantVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         D = parameterVector( dim * dim * dim * dim, 0 );
         for ( unsigned int K = 0; K < dim; K++ ){
@@ -1580,7 +1580,7 @@ namespace micromorphicLinearElasticity{
                                                      { grad_phi[ 7 ][ 0 ], grad_phi[ 7 ][ 1 ], grad_phi[ 7 ][ 2 ] },
                                                      { grad_phi[ 8 ][ 0 ], grad_phi[ 8 ][ 1 ], grad_phi[ 8 ][ 2 ] } };
 
-        errorOut error = micromorphicTools::assembleDeformationGradient( displacementGradient, deformationGradient );
+        errorOut error = tardigradeMicromorphicTools::assembleDeformationGradient( displacementGradient, deformationGradient );
 
         if ( error ){
             errorOut result = new errorNode( "assembleFundamentalDeformationMeasures",
@@ -1589,7 +1589,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::assembleMicroDeformation( microDisplacement, microDeformation );
+        error = tardigradeMicromorphicTools::assembleMicroDeformation( microDisplacement, microDeformation );
 
         if ( error ){
             errorOut result = new errorNode( "assembleFundamentalDeformationMeasures",
@@ -1598,7 +1598,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::assembleGradientMicroDeformation( gradientMicroDisplacement, gradientMicroDeformation );
+        error = tardigradeMicromorphicTools::assembleGradientMicroDeformation( gradientMicroDisplacement, gradientMicroDeformation );
 
         if ( error ){
             errorOut result = new errorNode( "assembleFundamentalDeformationMeasures",
@@ -1650,7 +1650,7 @@ namespace micromorphicLinearElasticity{
                                                      { grad_phi[ 7 ][ 0 ], grad_phi[ 7 ][ 1 ], grad_phi[ 7 ][ 2 ] },
                                                      { grad_phi[ 8 ][ 0 ], grad_phi[ 8 ][ 1 ], grad_phi[ 8 ][ 2 ] } };
 
-        errorOut error = micromorphicTools::assembleDeformationGradient( displacementGradient, deformationGradient, dFdGradU );
+        errorOut error = tardigradeMicromorphicTools::assembleDeformationGradient( displacementGradient, deformationGradient, dFdGradU );
 
         if ( error ){
             errorOut result = new errorNode( "assembleFundamentalDeformationMeasures (jacobian)",
@@ -1659,7 +1659,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::assembleMicroDeformation( microDisplacement, microDeformation, dChidPhi );
+        error = tardigradeMicromorphicTools::assembleMicroDeformation( microDisplacement, microDeformation, dChidPhi );
 
         if ( error ){
             errorOut result = new errorNode( "assembleFundamentalDeformationMeasures (jacobian)",
@@ -1668,7 +1668,7 @@ namespace micromorphicLinearElasticity{
             return result;
         }
 
-        error = micromorphicTools::assembleGradientMicroDeformation( gradientMicroDisplacement, gradientMicroDeformation,
+        error = tardigradeMicromorphicTools::assembleGradientMicroDeformation( gradientMicroDisplacement, gradientMicroDeformation,
                                                                      dGradChidGradPhi );
 
         if ( error ){
@@ -1726,7 +1726,7 @@ namespace micromorphicLinearElasticity{
         //Form the stiffness tensors
         errorOut error;
         if ( outputs[ 0 ].size() == 2 ){
-            error = micromorphicLinearElasticity::formIsotropicA( outputs[ 0 ][ 0 ], outputs[ 0 ][ 1 ], Amatrix );
+            error = tardigradeMicromorphicLinearElasticity::formIsotropicA( outputs[ 0 ][ 0 ], outputs[ 0 ][ 1 ], Amatrix );
         }
         else{
             std::string outstr = "Unrecognized number of parameters ( " + std::to_string( outputs[ 0 ].size() ) + " ) for the A stiffness tensor";
@@ -1741,7 +1741,7 @@ namespace micromorphicLinearElasticity{
         }
 
         if ( outputs[ 1 ].size() == 5 ){
-            error = micromorphicLinearElasticity::formIsotropicB( outputs[ 1 ][ 0 ], outputs[ 1 ][ 1 ], outputs[ 1 ][ 2 ],
+            error = tardigradeMicromorphicLinearElasticity::formIsotropicB( outputs[ 1 ][ 0 ], outputs[ 1 ][ 1 ], outputs[ 1 ][ 2 ],
                                                                   outputs[ 1 ][ 3 ], outputs[ 1 ][ 4 ], Bmatrix );
         }
         else{
@@ -1757,7 +1757,7 @@ namespace micromorphicLinearElasticity{
         }
 
         if ( outputs[ 2 ].size() == 11 ){
-            error = micromorphicLinearElasticity::formIsotropicC( outputs[ 2 ], Cmatrix );
+            error = tardigradeMicromorphicLinearElasticity::formIsotropicC( outputs[ 2 ], Cmatrix );
         }
         else{
             std::string outstr = "Unrecognized number of parameters ( " + std::to_string( outputs[ 2 ].size() ) + " ) for the C stiffness tensor";
@@ -1772,7 +1772,7 @@ namespace micromorphicLinearElasticity{
         }
 
         if ( outputs[ 3 ].size() == 2 ){
-            error = micromorphicLinearElasticity::formIsotropicD( outputs[ 3 ][ 0 ], outputs[ 3 ][ 1 ], Dmatrix );
+            error = tardigradeMicromorphicLinearElasticity::formIsotropicD( outputs[ 3 ][ 0 ], outputs[ 3 ][ 1 ], Dmatrix );
         }
         else{
             std::string outstr = "Unrecognized number of parameters ( " + std::to_string( outputs[ 3 ].size() ) + " ) for the D stiffness tensor";
@@ -1903,7 +1903,7 @@ namespace micromorphicLinearElasticity{
         //Compute the new stress values
         variableVector currentPK2Stress, currentReferenceMicroStress, currentReferenceHigherOrderStress;
 
-        error = micromorphicLinearElasticity::linearElasticityReference( currentDeformationGradient,
+        error = tardigradeMicromorphicLinearElasticity::linearElasticityReference( currentDeformationGradient,
                                                                          currentMicroDeformation,
                                                                          currentGradientMicroDeformation,
                                                                          Amatrix, Bmatrix, Cmatrix, Dmatrix,
@@ -2083,7 +2083,7 @@ namespace micromorphicLinearElasticity{
                        dSIGMAdDeformationGradient, dSIGMAdMicroDeformation, dSIGMAdGradientMicroDeformation,
                        dMdDeformationGradient, dMdGradientMicroDeformation;
 
-        error = micromorphicLinearElasticity::linearElasticityReference( currentDeformationGradient,
+        error = tardigradeMicromorphicLinearElasticity::linearElasticityReference( currentDeformationGradient,
                                                                          currentMicroDeformation,
                                                                          currentGradientMicroDeformation,
                                                                          Amatrix, Bmatrix, Cmatrix, Dmatrix,
@@ -2107,17 +2107,17 @@ namespace micromorphicLinearElasticity{
         | Assemble the Jacobian |
         =======================*/
 
-        DPK2Dgrad_u     = vectorTools::dot( dPK2dDeformationGradient, dDeformationGradientdGradU );
-        DPK2Dphi        = vectorTools::dot( dPK2dMicroDeformation, dMicroDeformationdPhi );
-        DPK2Dgrad_phi   = vectorTools::dot( dPK2dGradientMicroDeformation, dGradientMicroDeformationdGradPhi );
+        DPK2Dgrad_u     = tardigradeVectorTools::dot( dPK2dDeformationGradient, dDeformationGradientdGradU );
+        DPK2Dphi        = tardigradeVectorTools::dot( dPK2dMicroDeformation, dMicroDeformationdPhi );
+        DPK2Dgrad_phi   = tardigradeVectorTools::dot( dPK2dGradientMicroDeformation, dGradientMicroDeformationdGradPhi );
 
-        DSIGMADgrad_u   = vectorTools::dot( dSIGMAdDeformationGradient, dDeformationGradientdGradU );
-        DSIGMADphi      = vectorTools::dot( dSIGMAdMicroDeformation, dMicroDeformationdPhi );
-        DSIGMADgrad_phi = vectorTools::dot( dSIGMAdGradientMicroDeformation, dGradientMicroDeformationdGradPhi );
+        DSIGMADgrad_u   = tardigradeVectorTools::dot( dSIGMAdDeformationGradient, dDeformationGradientdGradU );
+        DSIGMADphi      = tardigradeVectorTools::dot( dSIGMAdMicroDeformation, dMicroDeformationdPhi );
+        DSIGMADgrad_phi = tardigradeVectorTools::dot( dSIGMAdGradientMicroDeformation, dGradientMicroDeformationdGradPhi );
 
-        DMDgrad_u       = vectorTools::dot( dMdDeformationGradient, dDeformationGradientdGradU );
+        DMDgrad_u       = tardigradeVectorTools::dot( dMdDeformationGradient, dDeformationGradientdGradU );
         DMDphi          = variableMatrix( 27, variableVector( 9, 0 ) );
-        DMDgrad_phi     = vectorTools::dot( dMdGradientMicroDeformation, dGradientMicroDeformationdGradPhi );
+        DMDgrad_phi     = tardigradeVectorTools::dot( dMdGradientMicroDeformation, dGradientMicroDeformationdGradPhi );
 
         //No errors in calculation.
         return 0;
